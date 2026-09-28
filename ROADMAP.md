@@ -22,12 +22,13 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
 - [x] Hook proti `waitForTimeout` (`.claude/hooks/block-wait-for-timeout.mts`, zapojený
       v `.claude/settings.json`): zablokuje Write/Edit, který by `waitForTimeout(` přidal do `.ts`/`.js`
       souboru. Pravidlo v `CLAUDE.md` je jen prosba, hook je zámek.
+- [x] Subagent `test-reviewer` (`.claude/agents/test-reviewer.md`): jen čte (Read, Grep, Glob),
+      kontroluje testy proti `CLAUDE.md` (nálezy) a obecným zvykům Playwrightu (doporučení).
+      Ověřený na souboru se schválnými chybami (našel všech 8).
 
 ## Další kroky
 
-1. **Subagent `test-reviewer`** (`.claude/agents/test-reviewer.md`): smí jen číst (Read, Grep, Glob)
-   a kontroluje testy proti pravidlům z `CLAUDE.md`.
-2. **Playwright Test Agents** (`npx playwright init-agents --loop=claude`): vyzkoušet
+1. **Playwright Test Agents** (`npx playwright init-agents --loop=claude`): vyzkoušet
    planner (napíše testovací plán) a generator (z plánu napíše testy) na jedné oblasti,
    např. vyhledávání.
    - ⚠️ **Healer nepoužívat, nebo mu přepsat instrukce.** Podle svých instrukcí se nemá ptát
@@ -35,10 +36,14 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
      se záměrnými chybami by schovával skutečné chyby aplikace, což je v rozporu s `CLAUDE.md`.
    - Příkaz vytvoří i `.mcp.json` a další soubory. Před spuštěním zjistit, které přesně.
 
-3. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
+2. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
    a podle výsledku ho doladit.
 
 ## Nápady na další testy
+
+- Z `test-reviewer`: `tests/accessibility/product-images.spec.ts` čeká jen na první obrázek,
+  pak kontroluje `alt` jednorázově. Když se zbytek produktů ještě vykresluje, může projít
+  a `test.fail()` by hlásil falešné „opraveno“. Zvážit `expect.poll(...)`.
 
 - `alt` u obrázků i na dalších stránkách: stránkování, kategorie, detail produktu.
 - Položka menu zní „Contakt“ místo „Contact“.
