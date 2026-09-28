@@ -31,10 +31,27 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
 1. **Playwright Test Agents** (`npx playwright init-agents --loop=claude`): vyzkoušet
    planner (napíše testovací plán) a generator (z plánu napíše testy) na jedné oblasti,
    např. vyhledávání.
-   - ⚠️ **Healer nepoužívat, nebo mu přepsat instrukce.** Podle svých instrukcí se nemá ptát
-     a má udělat cokoli, aby test prošel; když to nejde, označí ho `test.fixme()`. Na e-shopu
-     se záměrnými chybami by schovával skutečné chyby aplikace, což je v rozporu s `CLAUDE.md`.
-   - Příkaz vytvoří i `.mcp.json` a další soubory. Před spuštěním zjistit, které přesně.
+   - ⚠️ **Healer nepoužívat.** Podle svých instrukcí se nemá ptát a má udělat cokoli, aby test
+     prošel; když to nejde, označí ho `test.fixme()`. Na e-shopu se záměrnými chybami by schovával
+     skutečné chyby aplikace, což je v rozporu s `CLAUDE.md`.
+   - **Průzkum hotový** (Playwright 1.63.0, zdroják `node_modules/playwright/lib/agents/generateAgents.js`).
+     Příkaz vytvoří:
+     - `.claude/agents/playwright-test-planner.md`, `…-generator.md`, `…-healer.md`
+       (přepíše bez ptaní při každém spuštění; `test-reviewer` má jiný název, nevadí),
+     - `.mcp.json` se serverem `playwright-test` (`cmd /c npx playwright run-test-mcp-server`),
+       taky přepíše bez ptaní,
+     - `specs/README.md` (jen když `specs/` neexistuje),
+     - `tests/seed.spec.ts` (prázdný), jen když v `tests/` není žádný soubor s „seed“ v názvu.
+   - **Navržený postup (čeká na schválení):**
+     1. Předem vytvořit `tests/seed/seed.spec.ts` (jen otevře `/`), ať seed neleží přímo v `tests/`.
+     2. Rozšířit hook proti `waitForTimeout` i na MCP nástroj `mcp__playwright-test__generator_write_test`
+        (parametry `fileName`, `code`). Generator ukládá testy přes něj, ne přes Write/Edit,
+        takže ho současný hook nezachytí.
+     3. Spustit `init-agents`, zkontrolovat výstup, **healer smazat** (přepis instrukcí by další
+        `init-agents` vrátil; po každém spuštění mazat znovu). Commit.
+     4. Restart session, schválit MCP server, pak planner a generator na vyhledávání.
+        Planneru výslovně zadat jen `with-bugs.practicesoftwaretesting.com` (má `browser_run_code_unsafe`).
+        Vygenerované testy projdou `test-reviewer` a každý jednou schválně selže.
 
 2. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
    a podle výsledku ho doladit.
