@@ -19,7 +19,7 @@ Stav projektu a další kroky: [ROADMAP.md](ROADMAP.md). Struktura složek: [REA
   `getByTestId()` je v `playwright.config.ts` nastavené na atribut `data-test`.
 - Lokátory nehádej. Ověř je na skutečné stránce; když nemáš jak, požádej mě
   o „Pick locator“ z rozšíření Playwright ve VS Code.
-- Žádné pevné čekání (`waitForTimeout`).
+- Žádné pevné čekání (`waitForTimeout`). Hlídá to hook `.claude/hooks/block-wait-for-timeout.mts`.
 - Nový test patří do podsložky podle typu (`tests/smoke/`, `tests/accessibility/`, …).
 - Každý nový test si nech jednou schválně selhat (např. rozbitým lokátorem), ať je jisté,
   že umí selhat. Pak změnu vrať.

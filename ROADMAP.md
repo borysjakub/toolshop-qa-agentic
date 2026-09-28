@@ -19,14 +19,15 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
       chyby BUG-003 až BUG-005 (Jira TQA-2 až TQA-4)
 - [x] Skill `jira-ticket` (`.claude/skills/jira-ticket/SKILL.md`): postup z TQA-1 jako opakovatelný
       proces, spouští se ručně `/jira-ticket TQA-N`
+- [x] Hook proti `waitForTimeout` (`.claude/hooks/block-wait-for-timeout.mts`, zapojený
+      v `.claude/settings.json`): zablokuje Write/Edit, který by `waitForTimeout(` přidal do `.ts`/`.js`
+      souboru. Pravidlo v `CLAUDE.md` je jen prosba, hook je zámek.
 
 ## Další kroky
 
 1. **Subagent `test-reviewer`** (`.claude/agents/test-reviewer.md`): smí jen číst (Read, Grep, Glob)
    a kontroluje testy proti pravidlům z `CLAUDE.md`.
-2. **Hook proti `waitForTimeout`** (`.claude/settings.json`): automaticky zablokuje test,
-   který ho obsahuje. Pravidlo v `CLAUDE.md` je jen prosba, hook je zámek.
-3. **Playwright Test Agents** (`npx playwright init-agents --loop=claude`): vyzkoušet
+2. **Playwright Test Agents** (`npx playwright init-agents --loop=claude`): vyzkoušet
    planner (napíše testovací plán) a generator (z plánu napíše testy) na jedné oblasti,
    např. vyhledávání.
    - ⚠️ **Healer nepoužívat, nebo mu přepsat instrukce.** Podle svých instrukcí se nemá ptát
@@ -34,7 +35,7 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
      se záměrnými chybami by schovával skutečné chyby aplikace, což je v rozporu s `CLAUDE.md`.
    - Příkaz vytvoří i `.mcp.json` a další soubory. Před spuštěním zjistit, které přesně.
 
-4. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
+3. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
    a podle výsledku ho doladit.
 
 ## Nápady na další testy

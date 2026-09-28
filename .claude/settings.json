@@ -17,5 +17,19 @@
       "PowerShell(git push)",
       "PowerShell(git push *)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-wait-for-timeout.mts\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }
