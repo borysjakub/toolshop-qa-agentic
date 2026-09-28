@@ -17,6 +17,8 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
 - [x] Simulace práce v Jiře (prostor TQA): úkol TQA-1 „Otestovat přihlášení zákazníka“,
       [analýza a výsledky](tasks/tqa-1-login.md), testy `tests/auth/login.spec.ts`,
       chyby BUG-003 až BUG-005 (Jira TQA-2 až TQA-4)
+- [x] Skill `jira-ticket` (`.claude/skills/jira-ticket/SKILL.md`): postup z TQA-1 jako opakovatelný
+      proces, spouští se ručně `/jira-ticket TQA-N`
 
 ## Další kroky
 
@@ -32,9 +34,8 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
      se záměrnými chybami by schovával skutečné chyby aplikace, což je v rozporu s `CLAUDE.md`.
    - Příkaz vytvoří i `.mcp.json` a další soubory. Před spuštěním zjistit, které přesně.
 
-4. **Skill pro zpracování Jira ticketu**: postup z TQA-1 (analýza → testovací případy → testy
-   ověřené oběma směry → potvrzení chyb → bug reporty → Jira) zapsat jako skill, aby šel
-   zopakovat na dalším ticketu.
+4. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
+   a podle výsledku ho doladit.
 
 ## Nápady na další testy
 
