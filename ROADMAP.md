@@ -14,6 +14,9 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
       aby každý bug report vypadal stejně
 - [x] Test nadpisu řazení: `tests/smoke/sort-heading.spec.ts`,
       známá chyba [BUG-002](bugs/bug-002-sort-heading-typo.md) („Sorth“), označeno `test.fail()`
+- [x] Simulace práce v Jiře (prostor TQA): úkol TQA-1 „Otestovat přihlášení zákazníka“,
+      [analýza a výsledky](tasks/tqa-1-login.md), testy `tests/auth/login.spec.ts`,
+      chyby BUG-003 až BUG-005 (Jira TQA-2 až TQA-4)
 
 ## Další kroky
 
@@ -29,9 +32,16 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
      se záměrnými chybami by schovával skutečné chyby aplikace, což je v rozporu s `CLAUDE.md`.
    - Příkaz vytvoří i `.mcp.json` a další soubory. Před spuštěním zjistit, které přesně.
 
+4. **Skill pro zpracování Jira ticketu**: postup z TQA-1 (analýza → testovací případy → testy
+   ověřené oběma směry → potvrzení chyb → bug reporty → Jira) zapsat jako skill, aby šel
+   zopakovat na dalším ticketu.
+
 ## Nápady na další testy
 
 - `alt` u obrázků i na dalších stránkách: stránkování, kategorie, detail produktu.
 - Položka menu zní „Contakt“ místo „Contact“.
 - Logo v hlavičce se nenačte (rozbitý obrázek). Ověřit i `alt`, podobně jako BUG-001.
 - Výběr řazení je po načtení prázdný. Ověřit, jestli je to chyba, nebo jen nevybraná výchozí hodnota.
+- Z TQA-1 (viz [tasks/tqa-1-login.md](tasks/tqa-1-login.md), sekce 4): API registrace vrací hash hesla;
+  tlačítko zobrazení hesla nemá přístupný název; hláška přihlášení nemá `aria-live`;
+  odkaz „Home“ vede na `#/contact`.

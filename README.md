@@ -37,6 +37,9 @@ test selže a ve výsledcích se počítá jako prošlý. Až chybu někdo oprav
 
 - `tests/smoke/` — rychlé ověření, že základní části webu fungují
 - `tests/accessibility/` — testy přístupnosti
+- `tests/auth/` — přihlášení a odhlášení
+- `tests/helpers/` — sdílené pomocné funkce (např. registrace testovacího účtu přes API)
+- `tasks/` — simulované pracovní úkoly z Jiry: analýza zadání, testovací případy, výsledky
 - `bugs/` — bug reporty nalezených chyb aplikace
 - [ROADMAP.md](ROADMAP.md) — plán dalších kroků
 - `CLAUDE.md`, `.claude/` — pravidla a nastavení pro AI agenta Claude Code
