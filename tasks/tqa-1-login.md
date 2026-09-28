@@ -18,7 +18,7 @@ Jira: [TQA-1](https://borysjakub.atlassian.net/browse/TQA-1) · Testy: [`tests/a
 
 | Otázka | Odpověď | Zdroj |
 |---|---|---|
-| Kolik je „několik“ pokusů (AC3)? | **3** | Referenční verze aplikace bez chyb (`sprint5/API/app/Services/UserService.php`, `MAX_LOGIN_ATTEMPTS = 3`). V simulaci to zastupuje odpověď vývojáře nebo vedoucího. |
+| Kolik je „několik“ pokusů (AC3)? | **3** | Potvrdil vedoucí QA v komentáři TQA-1 (28. 9. 2026). Původní předpoklad vycházel z referenční verze aplikace bez chyb (`sprint5/API/app/Services/UserService.php`, `MAX_LOGIN_ATTEMPTS = 3`). |
 | Jak má hláška o zablokování znít? | Musí obsahovat „locked“ | Tamtéž: „Account locked, too many failed attempts. Please contact the administrator.“ |
 | Má se u neznámého e-mailu a u špatného hesla ukázat stejná hláška? | Ano | Bezpečnostní praxe: jiná hláška by prozradila, které e-maily jsou registrované. |
 | Jde o zákazníka, nebo i o admina? | Jen zákazník | Zadání mluví o zákazníkovi. Admin je v referenční verzi ze zablokování vyjmutý, netestováno. |
