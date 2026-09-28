@@ -9,3 +9,4 @@ test('homepage loads and shows at least one product', async ({ page }) => {
   const productNames = page.getByTestId('product-name');
   await expect(productNames.first()).toBeVisible();
 });
+

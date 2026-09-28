@@ -29,3 +29,14 @@ npx playwright test
 
 - `npx playwright test --ui` — interaktivní režim s náhledem běhu testů
 - `npx playwright show-report` — HTML report posledního běhu
+
+Testy, které odhalily známou chybu aplikace, jsou označené `test.fail()`. Dokud chyba trvá,
+test selže a ve výsledcích se počítá jako prošlý. Až chybu někdo opraví, Playwright to nahlásí.
+
+## Struktura
+
+- `tests/smoke/` — rychlé ověření, že základní části webu fungují
+- `tests/accessibility/` — testy přístupnosti
+- `bugs/` — bug reporty nalezených chyb aplikace
+- [ROADMAP.md](ROADMAP.md) — plán dalších kroků
+- `CLAUDE.md`, `.claude/` — pravidla a nastavení pro AI agenta Claude Code
