@@ -149,5 +149,8 @@ vite.config.ts.timestamp-*
 /playwright/.cache/
 /playwright/.auth/
 
+# Playwright MCP server logs and snapshots
+/.playwright-mcp/
+
 # Claude Code personal settings
 .claude/settings.local.json

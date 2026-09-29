@@ -38,6 +38,7 @@ test selže a ve výsledcích se počítá jako prošlý. Až chybu někdo oprav
 - `tests/smoke/` — rychlé ověření, že základní části webu fungují
 - `tests/accessibility/` — testy přístupnosti
 - `tests/auth/` — přihlášení a odhlášení
+- `tests/search/` — vyhledávání produktů
 - `tests/helpers/` — sdílené pomocné funkce (např. registrace testovacího účtu přes API)
 - `tests/seed/` — výchozí stav stránky pro Playwright Test Agents (planner, generator)
 - `specs/` — testovací plány, které napsal agent planner

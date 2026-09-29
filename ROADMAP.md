@@ -49,10 +49,15 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
         (parametry `fileName`, `code`). Ověřeno simulovanými vstupy.
      3. [x] `init-agents` spuštěný, výstup zkontrolovaný, **healer smazaný**
         (další `init-agents` ho vrátí; po každém spuštění mazat znovu).
-     4. [ ] Restart session, schválit MCP server, pak planner a generator na vyhledávání.
-        Planneru výslovně zadat jen `with-bugs.practicesoftwaretesting.com` (má `browser_run_code_unsafe`).
-        Generatoru zadat seed `tests/seed/seed.spec.ts` (v jeho ukázce je napevno `tests/seed.spec.ts`).
-        Vygenerované testy projdou `test-reviewer` a každý jednou schválně selže.
+     4. [x] Planner napsal [plán vyhledávání](specs/search.md) (13 scénářů + odchylky),
+        generator z něj 4 testy do `tests/search/` (1.1, 1.3, 1.5, 1.7).
+        - Poučení: generator napsal souběh (četl starý seznam produktů), i když byl předem varovaný.
+          Opraveno helperem `tests/helpers/search.ts` (`searchFor` čeká na odpověď API).
+          Vygenerované testy vždy kontrolovat (`test-reviewer`, `--repeat-each=3`).
+        - Planner nemá kam uložit vlastní sekce (`planner_save_plan`), odchylky se musí dopsat ručně.
+        - Nalezená chyba [BUG-006](bugs/bug-006-search-hammer-misses-sledgehammer.md): „hammer“
+          nenajde Sledgehammer (chyba v API).
+   - **Zbývá:** dalších 9 scénářů z plánu (1.2, 1.4, 1.6, 1.8–1.13) přes generator.
 
 2. **API testy (Jira TQA-5)** přes `/jira-ticket`, tím se zároveň vyzkouší skill na novém ticketu.
    Automatické testy v Playwrightu (`request` fixture) do `tests/api/`; Postman na ruční průzkum
@@ -68,6 +73,11 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
   pak kontroluje `alt` jednorázově. Když se zbytek produktů ještě vykresluje, může projít
   a `test.fail()` by hlásil falešné „opraveno“. Zvážit `expect.poll(...)`.
 
+- Z plánu vyhledávání ([specs/search.md](specs/search.md), sekce „Observed deviations“):
+  hledání samých mezer ukáže „0 products found“; hledání `%` nepošle požadavek;
+  pole se po odeslání vymaže (ověřit); tlačítko hledání se jmenuje „Serch“.
+- Přístupnost vyhledávání: pole nemá přístupný název, reset se jmenuje jen „X“, po hledání
+  zůstává prázdná navigace „Pagination“; ikona u nadpisu „Search“ je rozbitý obrázek.
 - `alt` u obrázků i na dalších stránkách: stránkování, kategorie, detail produktu.
 - Položka menu zní „Contakt“ místo „Contact“.
 - Logo v hlavičce se nenačte (rozbitý obrázek). Ověřit i `alt`, podobně jako BUG-001.
