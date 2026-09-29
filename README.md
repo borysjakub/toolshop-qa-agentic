@@ -39,6 +39,8 @@ test selže a ve výsledcích se počítá jako prošlý. Až chybu někdo oprav
 - `tests/accessibility/` — testy přístupnosti
 - `tests/auth/` — přihlášení a odhlášení
 - `tests/helpers/` — sdílené pomocné funkce (např. registrace testovacího účtu přes API)
+- `tests/seed/` — výchozí stav stránky pro Playwright Test Agents (planner, generator)
+- `specs/` — testovací plány, které napsal agent planner
 - `tasks/` — simulované pracovní úkoly z Jiry: analýza zadání, testovací případy, výsledky
 - `bugs/` — bug reporty nalezených chyb aplikace
 - [ROADMAP.md](ROADMAP.md) — plán dalších kroků

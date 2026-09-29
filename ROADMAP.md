@@ -42,19 +42,25 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
        taky přepíše bez ptaní,
      - `specs/README.md` (jen když `specs/` neexistuje),
      - `tests/seed.spec.ts` (prázdný), jen když v `tests/` není žádný soubor s „seed“ v názvu.
-   - **Navržený postup (čeká na schválení):**
-     1. Předem vytvořit `tests/seed/seed.spec.ts` (jen otevře `/`), ať seed neleží přímo v `tests/`.
-     2. Rozšířit hook proti `waitForTimeout` i na MCP nástroj `mcp__playwright-test__generator_write_test`
-        (parametry `fileName`, `code`). Generator ukládá testy přes něj, ne přes Write/Edit,
-        takže ho současný hook nezachytí.
-     3. Spustit `init-agents`, zkontrolovat výstup, **healer smazat** (přepis instrukcí by další
-        `init-agents` vrátil; po každém spuštění mazat znovu). Commit.
-     4. Restart session, schválit MCP server, pak planner a generator na vyhledávání.
+   - **Postup:**
+     1. [x] `tests/seed/seed.spec.ts`: otevře `/` a počká na vykreslení produktů.
+        `init-agents` ho najde i v podsložce (hledá „seed“ v názvu všech testů projektu).
+     2. [x] Hook proti `waitForTimeout` hlídá i `mcp__playwright-test__generator_write_test`
+        (parametry `fileName`, `code`). Ověřeno simulovanými vstupy.
+     3. [x] `init-agents` spuštěný, výstup zkontrolovaný, **healer smazaný**
+        (další `init-agents` ho vrátí; po každém spuštění mazat znovu).
+     4. [ ] Restart session, schválit MCP server, pak planner a generator na vyhledávání.
         Planneru výslovně zadat jen `with-bugs.practicesoftwaretesting.com` (má `browser_run_code_unsafe`).
+        Generatoru zadat seed `tests/seed/seed.spec.ts` (v jeho ukázce je napevno `tests/seed.spec.ts`).
         Vygenerované testy projdou `test-reviewer` a každý jednou schválně selže.
 
-2. **Vyzkoušet skill `jira-ticket`** na novém ticketu (např. košík nebo registrace)
-   a podle výsledku ho doladit.
+2. **API testy (Jira TQA-5)** přes `/jira-ticket`, tím se zároveň vyzkouší skill na novém ticketu.
+   Automatické testy v Playwrightu (`request` fixture) do `tests/api/`; Postman na ruční průzkum
+   API před automatizací a exportovaná kolekce jako ukázka. API je v inzerátech na testery častý požadavek.
+
+3. **SQL**: Toolshop spuštěný lokálně v Dockeru (je open source, databáze MySQL).
+   Ticket typu „ověřit uložení objednávky“: akce v UI a kontrola dat v databázi SQL dotazem.
+   Na veřejné with-bugs verzi k databázi přístup nemáme. Docker Desktop je nainstalovaný.
 
 ## Nápady na další testy
 
