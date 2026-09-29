@@ -55,15 +55,17 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
           Opraveno helperem `tests/helpers/search.ts` (`searchFor` čeká na odpověď API).
           Vygenerované testy vždy kontrolovat (`test-reviewer`, `--repeat-each=3`).
         - Planner nemá kam uložit vlastní sekce (`planner_save_plan`), odchylky se musí dopsat ručně.
-        - Nalezená chyba [BUG-006](bugs/bug-006-search-hammer-misses-sledgehammer.md): „hammer“
-          nenajde Sledgehammer (chyba v API).
+        - Nalezená chyba [BUG-006](bugs/bug-006-search-hammer-misses-sledgehammer.md) (Jira TQA-6):
+          „hammer“ nenajde Sledgehammer (chyba v API).
    - **Zbývá:** dalších 9 scénářů z plánu (1.2, 1.4, 1.6, 1.8–1.13) přes generator.
 
-2. **API testy (Jira TQA-5)** přes `/jira-ticket`, tím se zároveň vyzkouší skill na novém ticketu.
+2. **Košík (Jira TQA-5, už zadaný)** přes `/jira-ticket`, tím se zároveň vyzkouší skill na novém ticketu.
+
+3. **API testy** (nový ticket v Jiře).
    Automatické testy v Playwrightu (`request` fixture) do `tests/api/`; Postman na ruční průzkum
    API před automatizací a exportovaná kolekce jako ukázka. API je v inzerátech na testery častý požadavek.
 
-3. **SQL**: Toolshop spuštěný lokálně v Dockeru (je open source, databáze MySQL).
+4. **SQL**: Toolshop spuštěný lokálně v Dockeru (je open source, databáze MySQL).
    Ticket typu „ověřit uložení objednávky“: akce v UI a kontrola dat v databázi SQL dotazem.
    Na veřejné with-bugs verzi k databázi přístup nemáme. Docker Desktop je nainstalovaný.
 

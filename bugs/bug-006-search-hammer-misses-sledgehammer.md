@@ -7,6 +7,7 @@
 | **Oblast** | Vyhledávání produktů (API `/products/search`) |
 | **Závažnost** | Střední (návrh, zdůvodnění níže) |
 | **Automatizovaný test** | [`tests/search/case-insensitive.spec.ts`](../tests/search/case-insensitive.spec.ts), označený `test.fail()` |
+| **Jira** | TQA-6 |
 
 ## Prostředí
 
