@@ -156,20 +156,32 @@ Common locators (seen on page): input getByTestId('search-query') (textbox has n
     - expect: Results come from the full catalogue, starting on page 1, not limited to page 2
     - expect: Pagination hidden if fewer than 10 results
 
+## Changes made while automating
+
+- **Input validation:** the search form accepts 3-40 characters (spaces count) and silently
+  ignores anything else; no request is sent. So a single '%' or '_' never reaches the API and
+  1.9 step 2 uses '%%%' and '___' instead; 1.9 step 3 uses 40 characters (the maximum) instead of 200.
+  1.9 is split into 4 tests so one failing character does not hide the others.
+- **1.13** searches 'Pliers' instead of 'Hammer', so it stays independent of BUG-006.
+- **1.6** is split into "on the homepage" and "after a previous search"; the second one waits for
+  the QA lead's answer (Jira TQA-12).
+
 ## Observed deviations (possible app bugs)
 
-Seen by the planner on the with-bugs build. Not yet confirmed as app bugs; each needs a failing
-test and a human decision before it becomes a bug report.
+Seen by the planner on the with-bugs build, then checked by automated tests. Status as of 29. 9. 2026.
 
-1. **Partial match misses Sledgehammer.** 'hammer' / 'Hammer' returns 6 products without
-   Sledgehammer, 'ham' returns 7 including it. Confirmed directly on the API
-   (`GET /products/search?q=hammer` → total 6, `?q=ham` → total 7), so it is a backend issue.
-2. **Whitespace-only search.** '   ' shows "Searched for:    " and "0 products found for '   '"
-   instead of the full listing.
-3. **'%' search does nothing.** No API request is sent; caption and count keep the previous query.
-   '_' alone not tried.
-4. **Input cleared after submit (unconfirmed, possibly timing-dependent).** After searching 'Saw'
-   or 'Drill' the input value read back as ''. The '%' search (no request) kept its value.
+1. **Partial match misses Sledgehammer.** → BUG-006 (Jira TQA-6). 'hammer' returns 6 products
+   without Sledgehammer, 'ham' returns 7. Backend: from 4 characters the API stops matching
+   in the middle of a word.
+2. **Whitespace-only search.** → BUG-009 (TQA-9). '   ' passes validation (spaces count) and shows
+   "0 products found for '   '" instead of the full listing.
+3. **'%' search does nothing.** Not a bug by itself: '%' is shorter than 3 characters and is
+   rejected by validation. Two real bugs found instead:
+   - '%%%' and '___' return the whole catalogue (SQL wildcards not escaped) → BUG-010 (TQA-10).
+   - A rejected term gets no message and no `aria-invalid` (WCAG 3.3.1) → BUG-011 (TQA-11).
+4. **Input cleared after submit.** → BUG-008 (TQA-8). Confirmed, not timing-dependent.
+- **New, found by test 1.13:** searching from page 2 shows "4 products found" but no products
+  → BUG-007 (TQA-7).
 5. **Label typos.** Search button accessible name "Serch" (use the test id). Outside search scope:
    "Sorth" (BUG-002), "Contakt", and "Home" linking to `#/contact`.
 6. **No-results state** shows only the count line, no friendly message. UX note, not a definite bug.

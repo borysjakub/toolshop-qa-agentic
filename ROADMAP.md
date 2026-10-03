@@ -57,7 +57,16 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
         - Planner nemá kam uložit vlastní sekce (`planner_save_plan`), odchylky se musí dopsat ručně.
         - Nalezená chyba [BUG-006](bugs/bug-006-search-hammer-misses-sledgehammer.md) (Jira TQA-6):
           „hammer“ nenajde Sledgehammer (chyba v API).
-   - **Zbývá:** dalších 9 scénářů z plánu (1.2, 1.4, 1.6, 1.8–1.13) přes generator.
+     5. [x] Zbylých 9 scénářů (1.2, 1.4, 1.6, 1.8–1.13) přes generator, s helperem v zadání.
+        - Poučení: planner viděl jen příznaky („`%` nic neudělá“). Příčina (validace 3–40 znaků)
+          se ukázala až při zkoumání, proč test selhává. Než chybu nahlásit, zjistit proč.
+        - Rozdělení testu `special-characters` odhalilo další selhání, která zakrývalo první.
+        - Nalezené chyby BUG-007 až BUG-011 (Jira TQA-7 až TQA-11), nejvážnější BUG-007:
+          hledání ze stránky 2 nezobrazí nic.
+        - Regulární výraz v `toHaveText` se neořezává: text prvků má mezery okolo, `^` selže.
+        - `test-reviewer` a schválné rozbíjení nepouštět současně (reviewer pak hlásí rozbití).
+   - **Čeká:** odpověď vedoucího QA v [TQA-12](https://borysjakub.atlassian.net/browse/TQA-12)
+     (prázdné hledání po předchozím hledání). Do té doby test `empty-search › after a previous search` selhává.
 
 2. **Košík (Jira TQA-5, už zadaný)** přes `/jira-ticket`, tím se zároveň vyzkouší skill na novém ticketu.
 
@@ -75,9 +84,9 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
   pak kontroluje `alt` jednorázově. Když se zbytek produktů ještě vykresluje, může projít
   a `test.fail()` by hlásil falešné „opraveno“. Zvážit `expect.poll(...)`.
 
-- Z plánu vyhledávání ([specs/search.md](specs/search.md), sekce „Observed deviations“):
-  hledání samých mezer ukáže „0 products found“; hledání `%` nepošle požadavek;
-  pole se po odeslání vymaže (ověřit); tlačítko hledání se jmenuje „Serch“.
+- Tlačítko hledání se jmenuje „Serch“ (překlep, podobně jako BUG-002).
+- Počítadlo výsledků na okamžik ukáže „26 products found“ a teprve pak správné číslo
+  (viděno u 'Hammer', '%%%', '   '). Zjistit, odkud se 26 bere.
 - Přístupnost vyhledávání: pole nemá přístupný název, reset se jmenuje jen „X“, po hledání
   zůstává prázdná navigace „Pagination“; ikona u nadpisu „Search“ je rozbitý obrázek.
 - `alt` u obrázků i na dalších stránkách: stránkování, kategorie, detail produktu.
