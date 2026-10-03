@@ -163,8 +163,9 @@ Common locators (seen on page): input getByTestId('search-query') (textbox has n
   1.9 step 2 uses '%%%' and '___' instead; 1.9 step 3 uses 40 characters (the maximum) instead of 200.
   1.9 is split into 4 tests so one failing character does not hide the others.
 - **1.13** searches 'Pliers' instead of 'Hammer', so it stays independent of BUG-006.
-- **1.6** is split into "on the homepage" and "after a previous search"; the second one waits for
-  the QA lead's answer (Jira TQA-12).
+- **1.6** is split into "on the homepage" and "after a previous search". The plan expected the
+  full listing to come back after an empty search; the QA lead decided otherwise (Jira TQA-12,
+  answer A): an empty submit is ignored, the previous results stay, the reset button (X) clears them.
 
 ## Observed deviations (possible app bugs)
 

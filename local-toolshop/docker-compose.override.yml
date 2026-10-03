@@ -1,0 +1,7 @@
+# Added on top of docker-compose.prod.yml from the official Toolshop repository.
+# The local API sends an e-mail after every order; without a mail server the order
+# request ends with HTTP 500. Writing mails to the Laravel log avoids an extra container.
+services:
+  laravel-api:
+    environment:
+      - MAIL_MAILER=log

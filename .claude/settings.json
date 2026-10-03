@@ -29,6 +29,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Read|Grep|Glob|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-with-bugs-source.mts\"",
+            "timeout": 10
+          }
+        ]
       }
     ]
   }

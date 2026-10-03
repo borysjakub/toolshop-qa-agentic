@@ -1,9 +1,13 @@
 {
   "name": "toolshop-qa-agentic",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "description": "Playwright + TypeScript tests of the Toolshop practice e-shop, built with AI agents",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/svobodaprojevu/toolshop-qa-agentic.git"
@@ -18,6 +22,7 @@
   "homepage": "https://github.com/svobodaprojevu/toolshop-qa-agentic#readme",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.3"
+    "@types/node": "^26.6.3",
+    "mysql2": "^3.24.5"
   }
 }
