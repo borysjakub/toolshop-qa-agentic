@@ -1,7 +1,8 @@
 import { randomUUID } from 'crypto';
 import { expect, type APIRequestContext, type Page } from '@playwright/test';
 
-export const API_URL = 'https://api-with-bugs.practicesoftwaretesting.com';
+// The API behind baseURL (see playwright.config.ts): public by default, local in CI.
+export const API_URL = process.env.API_URL ?? 'https://api-with-bugs.practicesoftwaretesting.com';
 
 export type TestUser = {
   id: number;

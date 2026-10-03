@@ -30,6 +30,14 @@ do {
 } until ($ok -or (Get-Date) -gt $deadline)
 if (-not $ok) { throw 'API did not start within 3 minutes (http://localhost:8091/status)' }
 
+Write-Host 'Waiting for the UI (Angular compiles on the first start)'
+$deadline = (Get-Date).AddMinutes(6)
+do {
+  Start-Sleep -Seconds 5
+  try { $ok = (Invoke-WebRequest -UseBasicParsing 'http://localhost:4200' -TimeoutSec 10).StatusCode -eq 200 } catch { $ok = $false }
+} until ($ok -or (Get-Date) -gt $deadline)
+if (-not $ok) { throw 'UI did not start within 6 minutes (http://localhost:4200)' }
+
 Write-Host 'Resetting the database to seed data'
 docker @compose exec -T laravel-api php artisan migrate:fresh --seed --force
 if ($LASTEXITCODE -ne 0) { throw 'database seeding failed' }

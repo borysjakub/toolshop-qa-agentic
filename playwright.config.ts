@@ -36,7 +36,9 @@ export default defineConfig({
     ? [['github'], ['list'], ['html', { open: 'never' }]]
     : [['html', { open: 'never' }]],
   use: {
-    baseURL: 'https://with-bugs.practicesoftwaretesting.com',
+    // BASE_URL / API_URL point the UI tests to the local Toolshop (CI does this to avoid
+    // the bot protection of the public demo). Default: the public app.
+    baseURL: process.env.BASE_URL ?? 'https://with-bugs.practicesoftwaretesting.com',
     // The app marks elements with `data-test`, so point getByTestId() at it.
     testIdAttribute: 'data-test',
     trace: 'on-first-retry',

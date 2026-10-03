@@ -26,7 +26,27 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
       kontroluje testy proti `CLAUDE.md` (nálezy) a obecným zvykům Playwrightu (doporučení).
       Ověřený na souboru se schválnými chybami (našel všech 8).
 
+- [x] **SQL testy** (`tests/db/`): Toolshop `sprint5-with-bugs` lokálně v Dockeru
+      (`local-toolshop/start.ps1`), objednávka přes API a kontrola v databázi (mysql2).
+      Chyby [BUG-012](bugs/bug-012-order-price-from-client.md) a [BUG-013](bugs/bug-013-order-for-another-customer.md) (Kritická).
+      - Poučení: testy měnící sdílená data (sklad) si data připraví samy (`beforeAll` přes SQL)
+        a běží jedním workerem (`workers: 1` v projektu `local-db`).
+      - Při přípravě se omylem četl kód verze s chybami. Od té doby to blokuje hook
+        `block-with-bugs-source.mts` (testujeme naslepo, specifikace je `sprint5/`).
+- [x] **CI** (`.github/workflows/playwright.yml`): push, PR, denně. Běží proti lokální kopii
+      v Dockeru na runneru, protože veřejné demo za Cloudflare občas zastaví CI („Performing
+      security verification“) a testy `test.fail()` by pak „procházely“ ze špatného důvodu.
+      Ověřeno: všechny testy se známou chybou selhávají lokálně ze stejného důvodu jako na veřejném webu.
+- [x] **Košík** (Jira TQA-5) přes postup skillu `jira-ticket`: [výsledky](tasks/tqa-5-cart.md),
+      chyby [BUG-014](bugs/bug-014-cart-line-total-zero.md) a [BUG-015](bugs/bug-015-cart-remove-does-nothing.md).
+- [x] **TQA-12** rozhodnuto vedoucím QA (A): prázdné hledání po hledání se ignoruje.
+
 ## Další kroky
+
+1. **API testy** (nový ticket v Jiře): Playwright `request` do `tests/api/`, Postman kolekce
+   na ruční průzkum. API je v inzerátech na testery častý požadavek.
+
+## Historie: Playwright Test Agents
 
 1. **Playwright Test Agents** (`npx playwright init-agents --loop=claude`): vyzkoušet
    planner (napíše testovací plán) a generator (z plánu napíše testy) na jedné oblasti,
@@ -65,18 +85,7 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
           hledání ze stránky 2 nezobrazí nic.
         - Regulární výraz v `toHaveText` se neořezává: text prvků má mezery okolo, `^` selže.
         - `test-reviewer` a schválné rozbíjení nepouštět současně (reviewer pak hlásí rozbití).
-   - **Čeká:** odpověď vedoucího QA v [TQA-12](https://borysjakub.atlassian.net/browse/TQA-12)
-     (prázdné hledání po předchozím hledání). Do té doby test `empty-search › after a previous search` selhává.
-
-2. **Košík (Jira TQA-5, už zadaný)** přes `/jira-ticket`, tím se zároveň vyzkouší skill na novém ticketu.
-
-3. **API testy** (nový ticket v Jiře).
-   Automatické testy v Playwrightu (`request` fixture) do `tests/api/`; Postman na ruční průzkum
-   API před automatizací a exportovaná kolekce jako ukázka. API je v inzerátech na testery častý požadavek.
-
-4. **SQL**: Toolshop spuštěný lokálně v Dockeru (je open source, databáze MySQL).
-   Ticket typu „ověřit uložení objednávky“: akce v UI a kontrola dat v databázi SQL dotazem.
-   Na veřejné with-bugs verzi k databázi přístup nemáme. Docker Desktop je nainstalovaný.
+   - [TQA-12](https://borysjakub.atlassian.net/browse/TQA-12) (prázdné hledání po hledání) rozhodnuto: A.
 
 ## Nápady na další testy
 
@@ -85,6 +94,10 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
   a `test.fail()` by hlásil falešné „opraveno“. Zvážit `expect.poll(...)`.
 
 - Tlačítko hledání se jmenuje „Serch“ (překlep, podobně jako BUG-002).
+- Košík (z TQA-5): tlačítko odebrání bez přístupného názvu a nedostupné z klávesnice;
+  v hlavičce tabulky dvakrát „Total“; množství v košíku povolí 0 (`min="0"`, referenční verze 1).
+- Objednávky (z SQL testů): `invoices` ukládá `payment_account_number` v čitelné podobě;
+  ověřit, jestli zákazník vidí cizí objednávky (`GET /invoices/{id}`).
 - Počítadlo výsledků na okamžik ukáže „26 products found“ a teprve pak správné číslo
   (viděno u 'Hammer', '%%%', '   '). Zjistit, odkud se 26 bere.
 - Přístupnost vyhledávání: pole nemá přístupný název, reset se jmenuje jen „X“, po hledání

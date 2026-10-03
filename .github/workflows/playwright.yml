@@ -5,16 +5,24 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  # Daily run against the live app: a known-bug test (test.fail) that starts passing
-  # means the bug was fixed, and the run turns red so someone closes the bug report.
+  # Daily run: a known-bug test (test.fail) that starts passing means the bug was fixed
+  # in the latest app images, and the run turns red so someone closes the bug report.
   schedule:
     - cron: '0 6 * * *'
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'local = Toolshop in Docker on the runner (default), public = the public demo'
+        type: choice
+        options: [local, public]
+        default: local
 
 jobs:
   test:
-    timeout-minutes: 30
+    timeout-minutes: 40
     runs-on: ubuntu-latest
+    env:
+      TARGET: ${{ inputs.target || 'local' }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -25,6 +33,27 @@ jobs:
         run: npm ci
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
+
+      # The public demo sits behind bot protection that blocks CI runners now and then,
+      # so by default the same app version runs locally in Docker (see local-toolshop/).
+      - name: Enable emulation for the arm64-only web server image
+        if: env.TARGET == 'local'
+        uses: docker/setup-qemu-action@v3
+      - name: Start local Toolshop
+        if: env.TARGET == 'local'
+        shell: pwsh
+        run: ./local-toolshop/start.ps1
+      - name: Point tests to the local Toolshop
+        if: env.TARGET == 'local'
+        # Defaults of the local Toolshop from .env.example (not secrets), plus the switches.
+        run: |
+          {
+            grep -E '^[A-Z_]+=' .env.example | grep -v '^LOCAL_TOOLSHOP='
+            echo "LOCAL_TOOLSHOP=1"
+            echo "BASE_URL=http://localhost:4200"
+            echo "API_URL=http://localhost:8091"
+          } >> "$GITHUB_ENV"
+
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v4
