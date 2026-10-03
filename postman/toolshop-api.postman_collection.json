@@ -1,0 +1,297 @@
+{
+  "info": {
+    "name": "Toolshop API (toolshop-qa-agentic)",
+    "description": "Manual exploration of the Toolshop REST API, mirroring the automated tests in tests/api/.\nImport together with an environment from postman/ (public or local) and run the whole collection: requests depend on each other (register -> login -> profile).\nKnown bugs (BUG-016 password hash in responses, BUG-017 password hint text) are covered by the Playwright tests, not here.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List products (page 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('pagination is consistent', () => {",
+                  "  pm.expect(body.current_page).to.eql(1);",
+                  "  pm.expect(body.data.length).to.be.within(1, body.per_page);",
+                  "  pm.expect(body.last_page).to.eql(Math.ceil(body.total / body.per_page));",
+                  "});",
+                  "pm.test('every product has a name and a positive price', () => {",
+                  "  body.data.forEach((p) => {",
+                  "    pm.expect(p.name).to.match(/\\S/);",
+                  "    pm.expect(p.price).to.be.above(0);",
+                  "  });",
+                  "});",
+                  "pm.collectionVariables.set('productId', body.data[0].id);",
+                  "pm.collectionVariables.set('productName', body.data[0].name);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{apiUrl}}/products?page=1", "host": ["{{apiUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Product detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('same product as in the list', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(String(body.id)).to.eql(String(pm.collectionVariables.get('productId')));",
+                  "  pm.expect(body.name).to.eql(pm.collectionVariables.get('productName'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{apiUrl}}/products/{{productId}}", "host": ["{{apiUrl}}"], "path": ["products", "{{productId}}"] }
+          }
+        },
+        {
+          "name": "Unknown product returns 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error message', () => pm.expect(pm.response.json().message).to.eql('Requested item not found'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{apiUrl}}/products/999999", "host": ["{{apiUrl}}"], "path": ["products", "999999"] }
+          }
+        },
+        {
+          "name": "Search products: pliers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('4 products found', () => pm.expect(body.total).to.eql(4));",
+                  "pm.test('only matching names', () => body.data.forEach((p) => pm.expect(p.name.toLowerCase()).to.include('pliers')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{apiUrl}}/products/search?q=pliers", "host": ["{{apiUrl}}"], "path": ["products", "search"], "query": [{ "key": "q", "value": "pliers" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register a new customer",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fresh throwaway account for every run (fake data, never the shared demo accounts).",
+                  "pm.collectionVariables.set('email', `qa-postman-${Date.now()}@example.com`);",
+                  "pm.collectionVariables.set('password', 'TestPass-2026!x');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('customer created with the given e-mail', () => {",
+                  "  pm.expect(body.id).to.exist;",
+                  "  pm.expect(body.email).to.eql(pm.collectionVariables.get('email'));",
+                  "});",
+                  "pm.collectionVariables.set('userId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Tess\",\n  \"last_name\": \"Tester\",\n  \"dob\": \"1990-01-01\",\n  \"address\": \"Test street 1\",\n  \"city\": \"Testville\",\n  \"state\": \"Test\",\n  \"country\": \"CZ\",\n  \"postal_code\": \"12345\",\n  \"phone\": \"123456789\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/users/register", "host": ["{{apiUrl}}"], "path": ["users", "register"] }
+          }
+        },
+        {
+          "name": "Register the same e-mail again is rejected",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('rejected with 409 or 422', () => pm.expect(pm.response.code).to.be.oneOf([409, 422]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Tess\",\n  \"last_name\": \"Tester\",\n  \"dob\": \"1990-01-01\",\n  \"address\": \"Test street 1\",\n  \"city\": \"Testville\",\n  \"state\": \"Test\",\n  \"country\": \"CZ\",\n  \"postal_code\": \"12345\",\n  \"phone\": \"123456789\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/users/register", "host": ["{{apiUrl}}"], "path": ["users", "register"] }
+          }
+        },
+        {
+          "name": "Register without data lists missing fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('required fields reported', () => pm.expect(pm.response.json()).to.include.keys('first_name', 'last_name', 'email', 'password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{apiUrl}}/users/register", "host": ["{{apiUrl}}"], "path": ["users", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('bearer token returned', () => {",
+                  "  pm.expect(body.token_type).to.eql('bearer');",
+                  "  pm.expect(body.access_token).to.match(/\\S/);",
+                  "});",
+                  "pm.collectionVariables.set('token', body.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": { "raw": "{{apiUrl}}/users/login", "host": ["{{apiUrl}}"], "path": ["users", "login"] }
+          }
+        },
+        {
+          "name": "Login with a wrong password is rejected",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"WrongPass-123\"\n}" },
+            "url": { "raw": "{{apiUrl}}/users/login", "host": ["{{apiUrl}}"], "path": ["users", "login"] }
+          }
+        },
+        {
+          "name": "My profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('profile of the logged-in customer', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.email).to.eql(pm.collectionVariables.get('email'));",
+                  "  pm.expect(String(body.id)).to.eql(String(pm.collectionVariables.get('userId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{apiUrl}}/users/me", "host": ["{{apiUrl}}"], "path": ["users", "me"] }
+          }
+        },
+        {
+          "name": "My profile without a token is rejected",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{apiUrl}}/users/me", "host": ["{{apiUrl}}"], "path": ["users", "me"] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "productId", "value": "" },
+    { "key": "productName", "value": "" },
+    { "key": "email", "value": "" },
+    { "key": "password", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "token", "value": "" }
+  ]
+}

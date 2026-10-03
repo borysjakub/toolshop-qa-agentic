@@ -6,7 +6,8 @@
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:postman": "npx --yes newman@6 run postman/toolshop-api.postman_collection.json -e postman/public.postman_environment.json"
   },
   "repository": {
     "type": "git",

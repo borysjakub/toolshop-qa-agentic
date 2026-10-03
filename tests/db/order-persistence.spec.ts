@@ -1,4 +1,5 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import type { Connection, RowDataPacket } from 'mysql2/promise';
 import { connectToDb, execute, select } from '../helpers/db';
 import { apiToken, registerUser, type TestUser } from '../helpers/users';
@@ -109,9 +110,7 @@ test.describe('order persistence (database)', () => {
   });
 
   // Known app bug BUG-012: the API stores the price sent by the client. Remove test.fail() once fixed.
-  test.fail('stored prices come from the catalogue, not from the client', {
-    annotation: { type: 'issue', description: 'bugs/bug-012-order-price-from-client.md' },
-  }, async ({ request }) => {
+  test.fail('stored prices come from the catalogue, not from the client', knownBug('bugs/bug-012-order-price-from-client.md', 'stored items with a price different from the catalogue'), async ({ request }) => {
     const { user, token } = await customer(request);
     const product = await productInStock(1);
     const quantity = 2;
@@ -157,9 +156,7 @@ test.describe('order persistence (database)', () => {
   });
 
   // Known app bug BUG-013: any logged-in customer can order on another account. Remove test.fail() once fixed.
-  test.fail('a customer cannot place an order for another customer', {
-    annotation: { type: 'issue', description: 'bugs/bug-013-order-for-another-customer.md' },
-  }, async ({ request }) => {
+  test.fail('a customer cannot place an order for another customer', knownBug('bugs/bug-013-order-for-another-customer.md', 'no order was stored on the victim\'s account'), async ({ request }) => {
     const victim = await customer(request);
     const attacker = await customer(request);
     const product = await productInStock(2);

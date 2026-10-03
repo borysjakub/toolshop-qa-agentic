@@ -28,16 +28,25 @@ Porušení těchto pravidel je **nález**.
 3. **Podsložka podle typu.** Test patří do `tests/<typ>/` (např. `smoke/`, `auth/`,
    `accessibility/`). Nález: `.spec.ts` přímo v `tests/`, nebo ve složce, která obsahu neodpovídá.
 4. **Známé chyby aplikace.** Každý `test.fail(...)` musí mít:
-   - anotaci `{ type: 'issue', description: 'bugs/bug-NNN-....md' }`,
-   - soubor, na který anotace odkazuje, musí existovat (ověř přes Glob),
+   - `knownBug('bugs/bug-NNN-....md', '<očekávaný text chyby>', …)` z `tests/helpers/known-bug.ts`
+     (vytvoří anotace `issue` a `expected-error`),
+   - soubor bug reportu, na který odkazuje, musí existovat (ověř přes Glob),
+   - očekávaný text, který dokládá právě tuhle chybu (konkrétní hodnota nebo lokátor, ne obecné
+     `element(s) not found` samotné). Příliš obecný text je nález: test by „prošel“ i při výpadku,
    - krátký komentář nad testem, která chyba to je.
 5. **Žádné schovávání chyb.** `test.fixme()` a `test.skip()` (i `describe.skip`/`describe.fixme`)
    jsou nález vždy. Uveď, že podle `CLAUDE.md` patří známá chyba do `test.fail()`.
-6. **Jen testovaná aplikace.** Jediná povolená doména je `with-bugs.practicesoftwaretesting.com`
-   (i její API). Nález: `goto`, `request` nebo odkaz na jinou doménu.
+6. **Jen testovaná aplikace.** Povolená je `with-bugs.practicesoftwaretesting.com` (i její API)
+   a lokální kopie na `localhost` (výjimka v `CLAUDE.md`). Adresy patří do `baseURL`, `API_URL`
+   nebo `.env`, ne natvrdo do testu. Nález: `goto`, `request` nebo odkaz na jinou doménu.
 7. **Žádné skutečné osobní údaje ani hesla.** Nález: jméno, e-mail, telefon nebo heslo, které
    nevypadá jako testovací (testovací jsou např. `@example.com`, generovaná data, zjevně
    vymyšlená hesla). Když si nejsi jistý, dej to do nálezů s poznámkou „ověřit“.
+8. **Hesla a přístupy.** Jen v `.env` / `process.env`, nikdy natvrdo v kódu (výjimka:
+   zjevně vymyšlená testovací hesla nových účtů).
+9. **Seznamy a čekání.** Hledání přes `searchFor()`; seznam produktů jen přes `toHaveCount`,
+   `toHaveText` nebo `expect.poll`, ne jednorázové `count()`/`allTextContents()` s kontrolou hned.
+   Regulární výraz v `toHaveText` bez `^` (text prvků má mezery okolo).
 
 ## B. Obecné zvyky Playwrightu (doporučení)
 

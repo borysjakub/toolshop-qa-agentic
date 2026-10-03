@@ -24,8 +24,8 @@ jobs:
     env:
       TARGET: ${{ inputs.target || 'local' }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: lts/*
           cache: npm
@@ -38,7 +38,7 @@ jobs:
       # so by default the same app version runs locally in Docker (see local-toolshop/).
       - name: Enable emulation for the arm64-only web server image
         if: env.TARGET == 'local'
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Start local Toolshop
         if: env.TARGET == 'local'
         shell: pwsh
@@ -56,7 +56,7 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report

@@ -2,6 +2,7 @@
 // Spec for unclear points: the bug-free reference version (sprint5) and its texts.
 
 import { test, expect } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import { PRODUCTS, addToCart, cartRow, money, openCart, removeButton } from '../helpers/cart';
 
 const { combinationPliers, pliers } = PRODUCTS;
@@ -18,9 +19,7 @@ test.describe('shopping cart', () => {
   });
 
   // AC2. Known app bug BUG-014: the line total is always $00.00. Remove test.fail() once fixed.
-  test.fail('TC-03 a cart line shows name, unit price, quantity and line total', {
-    annotation: { type: 'issue', description: 'bugs/bug-014-cart-line-total-zero.md' },
-  }, async ({ page }) => {
+  test.fail('TC-03 a cart line shows name, unit price, quantity and line total', knownBug('bugs/bug-014-cart-line-total-zero.md', 'Received: "$00.00"'), async ({ page }) => {
     await addToCart(page, combinationPliers, 2, 2);
     await openCart(page);
 
@@ -57,9 +56,7 @@ test.describe('shopping cart', () => {
   });
 
   // AC4. Known app bug BUG-015: the remove button does nothing. Remove test.fail() once fixed.
-  test.fail('TC-06 removing the only product empties the cart', {
-    annotation: { type: 'issue', description: 'bugs/bug-015-cart-remove-does-nothing.md' },
-  }, async ({ page }) => {
+  test.fail('TC-06 removing the only product empties the cart', knownBug('bugs/bug-015-cart-remove-does-nothing.md', 'Locator: getByTestId(\'product-title\')', 'Expected: 0', 'Received: 1'), async ({ page }) => {
     await addToCart(page, combinationPliers, 1, 1);
     await openCart(page);
 
@@ -71,9 +68,7 @@ test.describe('shopping cart', () => {
   });
 
   // AC4, the other product stays. Known app bug BUG-015. Remove test.fail() once fixed.
-  test.fail('TC-07 removing one of two products keeps the other one', {
-    annotation: { type: 'issue', description: 'bugs/bug-015-cart-remove-does-nothing.md' },
-  }, async ({ page }) => {
+  test.fail('TC-07 removing one of two products keeps the other one', knownBug('bugs/bug-015-cart-remove-does-nothing.md', 'Locator: getByTestId(\'product-title\')', '"Combination Pliers"'), async ({ page }) => {
     await addToCart(page, combinationPliers, 1, 1);
     await addToCart(page, pliers, 1, 2);
     await openCart(page);

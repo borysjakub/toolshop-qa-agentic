@@ -65,7 +65,7 @@ Všechno ostatní dělej samostatně a na konci ukaž, co a proč jsi rozhodl.
   - `page.goto` na stejnou adresu s `#` stránku znovu nenačte, stará hláška na ní zůstane.
 
 ### 5. Spuštění a ověření oběma směry
-- `npx playwright test <soubor> --reporter=list`.
+- `npx playwright test <soubor>` (bez `--reporter`, jinak se vypne hlídač známých chyb).
 - Ověř **každý** test oběma směry v dočasné kopii souboru (`*-mutation.spec.ts`, po použití smaž):
   - test, který prošel, musí po změně očekávání nebo vstupu selhat,
   - test, který selhal, musí s očekáváním nastaveným na chybné chování projít.

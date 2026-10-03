@@ -12,6 +12,23 @@ export type TestUser = {
   password: string;
 };
 
+// Body of POST /users/register for a fresh throwaway customer (unique e-mail, fake data).
+export function newUserPayload() {
+  return {
+    first_name: 'Tess',
+    last_name: 'Tester',
+    dob: '1990-01-01',
+    address: 'Test street 1',
+    city: 'Testville',
+    state: 'Test',
+    country: 'CZ',
+    postal_code: '12345',
+    phone: '123456789',
+    email: `qa-${randomUUID()}@example.com`,
+    password: 'TestPass-2026!x',
+  };
+}
+
 // Registers a fresh throwaway customer via the API, so tests never share state
 // and never lock the public demo accounts that other people use.
 // apiUrl: the public API by default, the local Toolshop API for database tests.
@@ -19,31 +36,17 @@ export async function registerUser(
   request: APIRequestContext,
   apiUrl: string = API_URL,
 ): Promise<TestUser> {
-  const user: Omit<TestUser, 'id'> = {
-    firstName: 'Tess',
-    lastName: 'Tester',
-    email: `qa-${randomUUID()}@example.com`,
-    password: 'TestPass-2026!x',
-  };
-
-  const response = await request.post(`${apiUrl}/users/register`, {
-    data: {
-      first_name: user.firstName,
-      last_name: user.lastName,
-      dob: '1990-01-01',
-      address: 'Test street 1',
-      city: 'Testville',
-      state: 'Test',
-      country: 'CZ',
-      postal_code: '12345',
-      phone: '123456789',
-      email: user.email,
-      password: user.password,
-    },
-  });
+  const payload = newUserPayload();
+  const response = await request.post(`${apiUrl}/users/register`, { data: payload });
   expect(response.status(), 'test user registration').toBe(201);
 
-  return { ...user, id: (await response.json()).id };
+  return {
+    id: (await response.json()).id,
+    firstName: payload.first_name,
+    lastName: payload.last_name,
+    email: payload.email,
+    password: payload.password,
+  };
 }
 
 // Logs in via the API and returns the bearer token for authorized API calls.

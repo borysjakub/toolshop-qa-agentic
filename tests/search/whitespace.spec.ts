@@ -2,13 +2,12 @@
 // seed: tests/seed/seed.spec.ts
 
 import { test, expect } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import { PLIERS, openHomepage, productNames, waitForSearchResponse } from '../helpers/search';
 
 test.describe('Product search', () => {
   // Known app bug BUG-009: three spaces pass validation and show '0 products found'. Remove test.fail() once fixed.
-  test.fail('Whitespace handling', {
-    annotation: { type: 'issue', description: 'bugs/bug-009-search-whitespace-only-term.md' },
-  }, async ({ page }) => {
+  test.fail('Whitespace handling', knownBug('bugs/bug-009-search-whitespace-only-term.md', 'Locator: getByTestId(\'search-result-count\')', 'Expected: 0', 'Received: 1'), async ({ page }) => {
     await openHomepage(page);
 
     // 1. Type '   ' (3 spaces) and click search-submit.

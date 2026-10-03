@@ -2,13 +2,12 @@
 // seed: tests/seed/seed.spec.ts
 
 import { test, expect } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import { openHomepage, productNames, searchFor } from '../helpers/search';
 
 test.describe('Product search', () => {
   // Known app bug BUG-008: the input is cleared after submit. Remove test.fail() once fixed.
-  test.fail('Search input behaviour after submit', {
-    annotation: { type: 'issue', description: 'bugs/bug-008-search-input-cleared-after-submit.md' },
-  }, async ({ page }) => {
+  test.fail('Search input behaviour after submit', knownBug('bugs/bug-008-search-input-cleared-after-submit.md', 'Expected: "Drill"', 'Received: ""'), async ({ page }) => {
     await openHomepage(page);
 
     // 1. Search 'Drill' and check the input value afterwards.

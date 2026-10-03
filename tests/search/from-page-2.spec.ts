@@ -2,13 +2,12 @@
 // seed: tests/seed/seed.spec.ts
 
 import { test, expect } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import { PLIERS, openHomepage, productNames, searchFor } from '../helpers/search';
 
 test.describe('Product search', () => {
   // Known app bug BUG-007: searching from page 2 shows the count but no products. Remove test.fail() once fixed.
-  test.fail('Search from a paginated listing', {
-    annotation: { type: 'issue', description: 'bugs/bug-007-search-from-page-2-shows-no-products.md' },
-  }, async ({ page }) => {
+  test.fail('Search from a paginated listing', knownBug('bugs/bug-007-search-from-page-2-shows-no-products.md', 'products found for \'Pliers\'', '+ Array []'), async ({ page }) => {
     await openHomepage(page);
     const pagination = page.getByRole('navigation', { name: 'Pagination' });
 

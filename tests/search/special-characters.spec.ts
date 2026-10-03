@@ -2,6 +2,7 @@
 // seed: tests/seed/seed.spec.ts
 
 import { test, expect, type Page } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import { openHomepage, searchFor } from '../helpers/search';
 
 // All terms below pass the form validation (3-40 characters), so each one sends a request
@@ -43,9 +44,7 @@ test.describe('Product search', () => {
     // The search form accepts 3-40 characters, so a single '%' or '_' never reaches the API.
     // Three of them are a valid term that still consists only of wildcard characters.
     // Known app bug BUG-010: '%' and '_' act as SQL wildcards. Remove test.fail() once fixed.
-    test.fail("'%%%' is treated literally, not as a wildcard", {
-      annotation: { type: 'issue', description: 'bugs/bug-010-search-sql-wildcards-not-escaped.md' },
-    }, async ({ page }) => {
+    test.fail("'%%%' is treated literally, not as a wildcard", knownBug('bugs/bug-010-search-sql-wildcards-not-escaped.md', 'Expected: "0 products found for \'%%%\'"', ' products found for \'%%%\' "'), async ({ page }) => {
       await openHomepage(page);
 
       // 2a. Search '%%%': 0 products, not the whole catalogue; heading/count reflect the query.
@@ -54,9 +53,7 @@ test.describe('Product search', () => {
     });
 
     // Known app bug BUG-010: '%' and '_' act as SQL wildcards. Remove test.fail() once fixed.
-    test.fail("'___' is treated literally, not as a wildcard", {
-      annotation: { type: 'issue', description: 'bugs/bug-010-search-sql-wildcards-not-escaped.md' },
-    }, async ({ page }) => {
+    test.fail("'___' is treated literally, not as a wildcard", knownBug('bugs/bug-010-search-sql-wildcards-not-escaped.md', 'Expected: "0 products found for \'___\'"', ' products found for \'___\' "'), async ({ page }) => {
       await openHomepage(page);
 
       // 2b. Search '___': 0 products, not the whole catalogue; heading/count reflect the query.

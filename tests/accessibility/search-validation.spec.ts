@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 import { openHomepage } from '../helpers/search';
 
 // WCAG 3.3.1 Error Identification: when the app detects an input error itself,
@@ -10,9 +11,7 @@ test.describe('search input validation', () => {
     { name: 'too long (41 characters)', term: 'a'.repeat(41) },
   ]) {
     // Known app bug BUG-011: a rejected term gets no message. Remove test.fail() once fixed.
-    test.fail(`rejected term is announced: ${name}`, {
-      annotation: { type: 'issue', description: 'bugs/bug-011-search-validation-not-announced.md' },
-    }, async ({ page }) => {
+    test.fail(`rejected term is announced: ${name}`, knownBug('bugs/bug-011-search-validation-not-announced.md', 'toHaveAttribute', 'unexpected value "null"'), async ({ page }) => {
       await openHomepage(page);
       const input = page.getByTestId('search-query');
 

@@ -41,10 +41,18 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
       chyby [BUG-014](bugs/bug-014-cart-line-total-zero.md) a [BUG-015](bugs/bug-015-cart-remove-does-nothing.md).
 - [x] **TQA-12** rozhodnuto vedoucím QA (A): prázdné hledání po hledání se ignoruje.
 
+- [x] **API testy** (`tests/api/`, 15 testů bez prohlížeče) a **Postman kolekce** (`postman/`,
+      ověřená Newmanem na veřejném i lokálním API). Chyby [BUG-016](bugs/bug-016-api-returns-password-hash.md)
+      (hash hesla v odpovědích) a [BUG-017](bugs/bug-017-register-reveals-password-hint.md).
+
+- [x] **Hlídač známých chyb** (`reporters/known-bug-guard.ts`, helper `knownBug()`): test
+      `test.fail()` musí selhat s očekávaným textem chyby, jinak běh selže. Ověřeno simulací
+      výpadku: Playwright hlásil „2 passed“, hlídač běh správně shodil.
+
 ## Další kroky
 
-1. **API testy** (nový ticket v Jiře): Playwright `request` do `tests/api/`, Postman kolekce
-   na ruční průzkum. API je v inzerátech na testery častý požadavek.
+1. **Jira**: založit tickety pro BUG-012 až BUG-017, okomentovat a uzavřít TQA-12,
+   výsledek TQA-5 do komentáře (spojení s Jirou vyžaduje přihlášení).
 
 ## Historie: Playwright Test Agents
 
@@ -98,8 +106,9 @@ Plán dalších kroků projektu. Každý krok je samostatný malý úkol: uděla
   v hlavičce tabulky dvakrát „Total“; množství v košíku povolí 0 (`min="0"`, referenční verze 1).
 - Objednávky (z SQL testů): `invoices` ukládá `payment_account_number` v čitelné podobě;
   ověřit, jestli zákazník vidí cizí objednávky (`GET /invoices/{id}`).
-- Počítadlo výsledků na okamžik ukáže „26 products found“ a teprve pak správné číslo
-  (viděno u 'Hammer', '%%%', '   '). Zjistit, odkud se 26 bere.
+- Počítadlo výsledků na okamžik ukáže „26 products found“ a teprve pak správné číslo.
+  Vysvětleno: 26 je `total` z `GET /products` (výpis bez půjčovny), stránka ho ukáže,
+  než dorazí odpověď hledání. Drobná vada zobrazení, testy na to čekají (`searchFor`).
 - Přístupnost vyhledávání: pole nemá přístupný název, reset se jmenuje jen „X“, po hledání
   zůstává prázdná navigace „Pagination“; ikona u nadpisu „Search“ je rozbitý obrázek.
 - `alt` u obrázků i na dalších stránkách: stránkování, kategorie, detail produktu.

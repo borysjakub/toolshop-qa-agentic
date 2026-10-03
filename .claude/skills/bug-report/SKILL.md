@@ -18,7 +18,7 @@ Tu oprav v testu, report nepiš. Když si nejsi jistý, čí je chyba, zeptej se
 
 ## Pravidla
 
-1. **Nejdřív reprodukuj.** Spusť test (`npx playwright test <soubor> --reporter=list`)
+1. **Nejdřív reprodukuj.** Spusť test (`npx playwright test <soubor>`)
    nebo projdi kroky na stránce. Když se chyba neprojeví, report nepiš a řekni to uživateli.
 2. **Nevymýšlej kroky.** Do „Kroky k reprodukci“ patří jen kroky, které jsi opravdu ověřil.
    Co ověřené není, patří do sekce „Co nebylo ověřeno“.
@@ -48,7 +48,9 @@ Tu oprav v testu, report nepiš. Když si nejsi jistý, čí je chyba, zeptej se
      chybná hodnota (např. `Received: "Sorth"`), ne timeout ani „element not found“.
    - **Projde bez chyby:** dočasně nastav očekávanou hodnotu na tu chybnou a spusť ho znovu.
      Musí projít. Pak změnu vrať.
-7. Pokračuj krokem 2 v sekci „Známé chyby aplikace“ v `CLAUDE.md` (`test.fail()` s anotací `issue`).
+7. Pokračuj krokem 2 v sekci „Známé chyby aplikace“ v `CLAUDE.md`: `test.fail()` s `knownBug()`.
+   Jako očekávaný text chyby vezmi z výstupu kroku 6 konkrétní chybnou hodnotu
+   (např. `Received: " Sorth"`), ne obecné `element(s) not found`.
 
 ## Stupnice závažnosti
 

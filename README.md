@@ -18,12 +18,17 @@ skilly, hooky a kontrolní subagent (viz [Jak tu pracuje AI](#jak-tu-pracuje-ai)
 | Přihlášení ([TQA-1](tasks/tqa-1-login.md)) | `tests/auth/` | [BUG-003](bugs/bug-003-account-not-locked.md) účet se nezablokuje (Kritická), [BUG-004](bugs/bug-004-user-menu-data-not-found.md), [BUG-005](bugs/bug-005-login-form-no-validation.md) |
 | Vyhledávání ([plán](specs/search.md)) | `tests/search/`, `tests/accessibility/search-validation.spec.ts` | [BUG-006](bugs/bug-006-search-hammer-misses-sledgehammer.md) až [BUG-011](bugs/bug-011-search-validation-not-announced.md), nejvážnější [BUG-007](bugs/bug-007-search-from-page-2-shows-no-products.md) hledání ze stránky 2 nic neukáže |
 | Košík ([TQA-5](tasks/tqa-5-cart.md)) | `tests/cart/` | [BUG-014](bugs/bug-014-cart-line-total-zero.md) mezisoučet $00.00, [BUG-015](bugs/bug-015-cart-remove-does-nothing.md) položku nejde odebrat |
+| REST API (Playwright + [Postman](postman/)) | `tests/api/` | [BUG-016](bugs/bug-016-api-returns-password-hash.md) API vrací hash hesla (Vysoká), [BUG-017](bugs/bug-017-register-reveals-password-hint.md) „Your password hint is …“ |
 | Objednávky v databázi (SQL) | `tests/db/` | [BUG-012](bugs/bug-012-order-price-from-client.md) cenu objednávky určuje klient, [BUG-013](bugs/bug-013-order-for-another-customer.md) objednávka na cizí účet (obojí Kritická) |
 | Přístupnost, smoke | `tests/accessibility/`, `tests/smoke/` | [BUG-001](bugs/bug-001-product-images-missing-alt.md) obrázky bez `alt`, [BUG-002](bugs/bug-002-sort-heading-typo.md) „Sorth“ |
 
 Všechny bug reporty: [`bugs/`](bugs/). Každá chyba má automatizovaný test označený `test.fail()`:
 dokud chyba trvá, test selže a počítá se jako prošlý. Až ji někdo opraví, test začne procházet
 a CI zčervená, takže se bug report uzavře.
+
+Aby takový test nemohl „projít“ z jiného důvodu (výpadek, ochrana proti botům, rozbitý lokátor),
+má u sebe zapsaný očekávaný text chyby (`knownBug()`) a vlastní reporter
+[`known-bug-guard`](reporters/known-bug-guard.ts) shodí běh, když se hláška neshoduje.
 
 ## Požadavky
 
@@ -57,6 +62,12 @@ npx playwright test --project=local-db
 
 Celou sadu jde pustit i proti lokální kopii: `BASE_URL=http://localhost:4200` a `API_URL=http://localhost:8091`.
 
+### Postman
+
+Kolekce [`postman/toolshop-api.postman_collection.json`](postman/toolshop-api.postman_collection.json)
+s prostředím `public` nebo `local`: v Postmanu *Import*, pak *Run collection* (požadavky na sebe
+navazují: registrace → přihlášení → profil). Z příkazové řádky: `npm run test:postman`.
+
 ## CI
 
 [GitHub Actions](.github/workflows/playwright.yml) běží po každém pushi, pull requestu a denně.
@@ -71,7 +82,9 @@ Ručně jde spustit i proti veřejnému demu (`workflow_dispatch`, volba `public
 - `tests/search/` vyhledávání (plán napsal agent planner, testy agent generator)
 - `tests/cart/` košík (TQA-5)
 - `tests/accessibility/` přístupnost (WCAG)
+- `tests/api/` REST API bez prohlížeče (produkty, registrace, přihlášení, profil)
 - `tests/db/` objednávky přes API + kontrola v databázi SQL dotazy (jen lokální kopie)
+- `postman/` Postman kolekce a prostředí pro ruční průzkum API
 - `tests/helpers/` sdílené funkce: účty a přihlášení přes API, hledání, košík, databáze
 - `tests/seed/` výchozí stav stránky pro Playwright Test Agents
 - `specs/` testovací plány · `tasks/` výsledky Jira úkolů · `bugs/` bug reporty

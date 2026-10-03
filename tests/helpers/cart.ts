@@ -37,7 +37,9 @@ export async function openCart(page: Page) {
 
 // The cart row of one product.
 export function cartRow(page: Page, product: CartProduct) {
-  return page.getByRole('row').filter({ has: page.getByTestId('product-title').filter({ hasText: product.name }) });
+  // Exact name: "Pliers" must not match the "Combination Pliers" row.
+  const title = page.getByTestId('product-title').filter({ hasText: new RegExp(`^\\s*${product.name}\\s*$`) });
+  return page.getByRole('row').filter({ has: title });
 }
 
 // The remove button of a cart row. It is an <a> without href, accessible name or test id

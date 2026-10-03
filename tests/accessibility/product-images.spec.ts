@@ -1,10 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { knownBug } from '../helpers/known-bug';
 
 // Known app bug BUG-001: test.fail() makes Playwright expect this test to fail.
 // When the bug gets fixed, the test starts passing, Playwright reports that as an error, and test.fail() should be removed.
-test.fail('every product image on the homepage has an alt attribute', {
-  annotation: { type: 'issue', description: 'bugs/bug-001-product-images-missing-alt.md' },
-}, async ({ page }) => {
+test.fail('every product image on the homepage has an alt attribute', knownBug('bugs/bug-001-product-images-missing-alt.md', 'assets/img/products/'), async ({ page }) => {
   await page.goto('/');
 
   // Product cards are the links that contain a product name.

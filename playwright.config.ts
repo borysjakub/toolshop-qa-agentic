@@ -9,7 +9,7 @@ try {
 }
 
 // Database tests need the local Toolshop from local-toolshop/start.ps1, so they run
-// only when LOCAL_TOOLSHOP is set (never in CI, which tests the public app).
+// only when LOCAL_TOOLSHOP is set (locally via .env, in CI by the workflow).
 const localDbProject: Project = {
   name: 'local-db',
   testMatch: 'db/**/*.spec.ts',
@@ -30,11 +30,15 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  // CI: 'github' annotates failures in the run summary, html is uploaded as an artifact.
-  // Locally: html report, opened only on demand (npm run report).
-  reporter: process.env.CI
-    ? [['github'], ['list'], ['html', { open: 'never' }]]
-    : [['html', { open: 'never' }]],
+  // list: result of every test in the console; html: report (npm run report, never auto-opened);
+  // known-bug-guard: a test.fail() test must fail because of its known bug, not anything else.
+  // CI adds 'github' annotations in the run summary.
+  reporter: [
+    ...(process.env.CI ? [['github'] as const] : []),
+    ['list'],
+    ['html', { open: 'never' }],
+    ['./reporters/known-bug-guard.ts'],
+  ],
   use: {
     // BASE_URL / API_URL point the UI tests to the local Toolshop (CI does this to avoid
     // the bot protection of the public demo). Default: the public app.
