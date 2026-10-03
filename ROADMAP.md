@@ -2,6 +2,20 @@
 
 Plán dalších kroků projektu. Každý krok je samostatný malý úkol: udělat, zkontrolovat, commitnout.
 
+## ▶ Kde pokračovat (stav k 3. 10. 2026)
+
+Všechno je na GitHubu, CI zelené (59 testů proti lokální kopii v Dockeru). Zbývá jen Jira:
+
+1. Spustit Claude Code (`claude --continue`) a ověřit `/mcp` → **atlassian = connected**.
+   V minulé session se nástroje Jiry po přihlášení nenačetly, pomáhá restart Claude Code.
+2. Zapsat do Jiry vše z [tasks/jira-pending.md](tasks/jira-pending.md): 6 chyb BUG-012 až
+   BUG-017 (vazby Blocks na TQA-5), komentář a uzavření TQA-12, shrnutí do TQA-5.
+3. Doplnit klíče ticketů do `bugs/bug-012` až `bug-017` (řádek **Jira**), smazat
+   `tasks/jira-pending.md`, commit a push.
+
+Pro databázové testy lokálně: Docker Desktop, `.\local-toolshop\start.ps1`, v `.env` `LOCAL_TOOLSHOP=1`.
+Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
+
 ## Hotovo
 
 - [x] Playwright + TypeScript, prohlížeč Chromium, `baseURL`, `testIdAttribute: 'data-test'`
