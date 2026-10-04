@@ -1,8 +1,8 @@
-import { test, expect, type APIRequestContext } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { knownBug } from '../helpers/known-bug';
 import type { Connection, RowDataPacket } from 'mysql2/promise';
 import { connectToDb, execute, select } from '../helpers/db';
-import { apiToken, registerUser, type TestUser } from '../helpers/users';
+import { customer, placeOrder, productInStock, type Product } from '../helpers/orders';
 
 // Runs against the LOCAL Toolshop only (local-toolshop/start.ps1, project "local-db").
 // The order is created through the API, then the database is checked with SQL:
@@ -11,9 +11,6 @@ import { apiToken, registerUser, type TestUser } from '../helpers/users';
 // Every run consumes stock, so beforeAll tops it up (test data setup via SQL).
 // The first test is not test.fail(): if the environment is broken (no database, no stock),
 // it fails loudly instead of the known-bug tests "passing" for the wrong reason.
-const API = process.env.LOCAL_TOOLSHOP_API_URL ?? 'http://localhost:8091';
-
-type Product = RowDataPacket & { id: number; name: string; price: number; stock: number };
 type Invoice = RowDataPacket & { id: number; user_id: number; total: number; billing_city: string };
 type InvoiceItem = RowDataPacket & { product_id: number; unit_price: number; quantity: number };
 
@@ -29,55 +26,10 @@ test.afterAll(async () => {
   await db?.end();
 });
 
-// A purchasable product with enough stock; `skip` picks a different one per test.
-// Thor Hammer is excluded: the API allows only one per order (business rule).
-// OFFSET is inlined (forced to a number) because MariaDB prepared statements
-// do not accept a placeholder there.
-async function productInStock(skip: number): Promise<Product> {
-  const [product] = await select<Product>(
-    db,
-    `SELECT id, name, price, stock FROM products
-     WHERE stock >= 10 AND is_rental = 0 AND name <> 'Thor Hammer'
-     ORDER BY id LIMIT 1 OFFSET ${Math.trunc(Number(skip))}`,
-  );
-  expect(product, 'seed data has a product in stock').toBeDefined();
-  return product;
-}
-
-async function placeOrder(
-  request: APIRequestContext,
-  token: string,
-  order: { userId: number; total: number; items: { productId: number; unitPrice: number; quantity: number }[] },
-) {
-  return request.post(`${API}/invoices`, {
-    headers: { Authorization: `Bearer ${token}` },
-    data: {
-      user_id: order.userId,
-      billing_address: 'Test street 1',
-      billing_city: 'Testville',
-      billing_state: 'Test',
-      billing_country: 'CZ',
-      billing_postcode: '12345',
-      payment_method: 'cash-on-delivery',
-      total: order.total,
-      invoice_items: order.items.map((item) => ({
-        product_id: item.productId,
-        unit_price: item.unitPrice,
-        quantity: item.quantity,
-      })),
-    },
-  });
-}
-
-async function customer(request: APIRequestContext): Promise<{ user: TestUser; token: string }> {
-  const user = await registerUser(request, API);
-  return { user, token: await apiToken(request, user, API) };
-}
-
 test.describe('order persistence (database)', () => {
   test('order is stored with its items and the stock is decremented', async ({ request }) => {
     const { user, token } = await customer(request);
-    const product = await productInStock(0);
+    const product = await productInStock(db, 0);
     const quantity = 2;
     const total = Math.round(product.price * quantity * 100) / 100;
 
@@ -112,7 +64,7 @@ test.describe('order persistence (database)', () => {
   // Known app bug BUG-012: the API stores the price sent by the client. Remove test.fail() once fixed.
   test.fail('stored prices come from the catalogue, not from the client', knownBug('bugs/bug-012-order-price-from-client.md', 'stored items with a price different from the catalogue'), async ({ request }) => {
     const { user, token } = await customer(request);
-    const product = await productInStock(1);
+    const product = await productInStock(db, 1);
     const quantity = 2;
 
     // The client claims a price of 0.01 per item.
@@ -159,7 +111,7 @@ test.describe('order persistence (database)', () => {
   test.fail('a customer cannot place an order for another customer', knownBug('bugs/bug-013-order-for-another-customer.md', 'no order was stored on the victim\'s account'), async ({ request }) => {
     const victim = await customer(request);
     const attacker = await customer(request);
-    const product = await productInStock(2);
+    const product = await productInStock(db, 2);
 
     const response = await placeOrder(request, attacker.token, {
       userId: victim.user.id,

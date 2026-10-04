@@ -64,6 +64,11 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
 - [x] **Jira** (4. 10. 2026): BUG-012 až BUG-017 jako TQA-13 až TQA-18 (TQA-15 a TQA-16
       blokují TQA-5, TQA-17 souvisí s TQA-1), TQA-12 okomentován a uzavřen, shrnutí v TQA-5
       (stav Probíhající, čeká na odpověď ke dvěma otázkám).
+- [x] **Přístup k fakturám** (`tests/db/order-access.spec.ts`): zákazník vidí cizí faktury
+      ve výpisu i v detailu, [BUG-018](bugs/bug-018-customer-sees-other-invoices.md) (Kritická, Jira TQA-19).
+      - Očekávané chování ověřeno spuštěním referenční verze `sprint5` lokálně v Dockeru
+        (vedle with-bugs, vlastní port), ne jen čtením kódu.
+      - Helper `tests/helpers/orders.ts` (zákazník, objednávka, produkt na skladě) sdílejí databázové testy.
 
 ## Historie: Playwright Test Agents
 
@@ -115,8 +120,9 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
 - Tlačítko hledání se jmenuje „Serch“ (překlep, podobně jako BUG-002).
 - Košík (z TQA-5): tlačítko odebrání bez přístupného názvu a nedostupné z klávesnice;
   v hlavičce tabulky dvakrát „Total“; množství v košíku povolí 0 (`min="0"`, referenční verze 1).
-- Objednávky (z SQL testů): `invoices` ukládá `payment_account_number` v čitelné podobě;
-  ověřit, jestli zákazník vidí cizí objednávky (`GET /invoices/{id}`).
+- Objednávky (z SQL testů): `invoices` ukládá `payment_account_number` v čitelné podobě.
+- Faktury (z BUG-018): ověřit `GET /invoices/search`, `GET /invoices/{id}/download-pdf`
+  a změnu cizí faktury (`PUT`, `PATCH`).
 - Počítadlo výsledků na okamžik ukáže „26 products found“ a teprve pak správné číslo.
   Vysvětleno: 26 je `total` z `GET /products` (výpis bez půjčovny), stránka ho ukáže,
   než dorazí odpověď hledání. Drobná vada zobrazení, testy na to čekají (`searchFor`).
