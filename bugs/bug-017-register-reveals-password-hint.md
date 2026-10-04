@@ -7,6 +7,7 @@
 | **Oblast** | API registrace (`POST /users/register`), bezpečnost |
 | **Závažnost** | Nízká (návrh, zdůvodnění níže) |
 | **Automatizovaný test** | [`tests/api/users.spec.ts`](../tests/api/users.spec.ts) (API-10), označený `test.fail()` |
+| **Jira** | TQA-18 |
 
 ## Prostředí
 

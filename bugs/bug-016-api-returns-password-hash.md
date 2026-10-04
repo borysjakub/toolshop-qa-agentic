@@ -7,6 +7,7 @@
 | **Oblast** | API uživatelů (`POST /users/register`, `GET /users/me`), bezpečnost |
 | **Závažnost** | Vysoká (návrh, zdůvodnění níže) |
 | **Automatizovaný test** | [`tests/api/users.spec.ts`](../tests/api/users.spec.ts) (API-15), označený `test.fail()` |
+| **Jira** | TQA-17 (souvisí s TQA-1) |
 
 ## Prostředí
 

@@ -7,7 +7,7 @@
 | **Oblast** | Košík |
 | **Závažnost** | Střední (návrh, zdůvodnění níže) |
 | **Automatizovaný test** | [`tests/cart/cart.spec.ts`](../tests/cart/cart.spec.ts) (TC-03), označený `test.fail()` |
-| **Jira** | TQA-5 (zadání, AC2) |
+| **Jira** | TQA-15 (blokuje TQA-5, AC2) |
 
 ## Prostředí
 

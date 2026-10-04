@@ -2,16 +2,14 @@
 
 Plán dalších kroků projektu. Každý krok je samostatný malý úkol: udělat, zkontrolovat, commitnout.
 
-## ▶ Kde pokračovat (stav k 3. 10. 2026)
+## ▶ Kde pokračovat (stav k 4. 10. 2026)
 
-Všechno je na GitHubu, CI zelené (59 testů proti lokální kopii v Dockeru). Zbývá jen Jira:
+Všechno je na GitHubu, CI zelené (59 testů proti lokální kopii v Dockeru), Jira je aktuální.
+TQA-5 čeká na odpověď vedoucího QA (dvě otázky v komentáři: AC5 a množství 0).
+Další práci vybrat z „Nápady na další testy“ níže.
 
-1. Spustit Claude Code (`claude --continue`) a ověřit `/mcp` → **atlassian = connected**.
-   V minulé session se nástroje Jiry po přihlášení nenačetly, pomáhá restart Claude Code.
-2. Zapsat do Jiry vše z [tasks/jira-pending.md](tasks/jira-pending.md): 6 chyb BUG-012 až
-   BUG-017 (vazby Blocks na TQA-5), komentář a uzavření TQA-12, shrnutí do TQA-5.
-3. Doplnit klíče ticketů do `bugs/bug-012` až `bug-017` (řádek **Jira**), smazat
-   `tasks/jira-pending.md`, commit a push.
+Spojení s Jirou: `/mcp` → atlassian → přihlásit. Když se nástroje po přihlášení nenačtou,
+pomáhá restart Claude Code (`claude --continue`).
 
 Pro databázové testy lokálně: Docker Desktop, `.\local-toolshop\start.ps1`, v `.env` `LOCAL_TOOLSHOP=1`.
 Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
@@ -63,10 +61,9 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
       `test.fail()` musí selhat s očekávaným textem chyby, jinak běh selže. Ověřeno simulací
       výpadku: Playwright hlásil „2 passed“, hlídač běh správně shodil.
 
-## Další kroky
-
-1. **Jira**: založit tickety pro BUG-012 až BUG-017, okomentovat a uzavřít TQA-12,
-   výsledek TQA-5 do komentáře (spojení s Jirou vyžaduje přihlášení).
+- [x] **Jira** (4. 10. 2026): BUG-012 až BUG-017 jako TQA-13 až TQA-18 (TQA-15 a TQA-16
+      blokují TQA-5, TQA-17 souvisí s TQA-1), TQA-12 okomentován a uzavřen, shrnutí v TQA-5
+      (stav Probíhající, čeká na odpověď ke dvěma otázkám).
 
 ## Historie: Playwright Test Agents
 

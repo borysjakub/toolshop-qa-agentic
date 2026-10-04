@@ -7,6 +7,7 @@
 | **Oblast** | Objednávky (API `POST /invoices`), bezpečnost |
 | **Závažnost** | Kritická (návrh, zdůvodnění níže) |
 | **Automatizovaný test** | [`tests/db/order-persistence.spec.ts`](../tests/db/order-persistence.spec.ts) („stored prices come from the catalogue…“), označený `test.fail()` |
+| **Jira** | TQA-13 |
 
 ## Prostředí
 

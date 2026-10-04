@@ -7,6 +7,7 @@
 | **Oblast** | Objednávky (API `POST /invoices`), bezpečnost (řízení přístupu) |
 | **Závažnost** | Kritická (návrh, zdůvodnění níže) |
 | **Automatizovaný test** | [`tests/db/order-persistence.spec.ts`](../tests/db/order-persistence.spec.ts) („a customer cannot place an order for another customer“), označený `test.fail()` |
+| **Jira** | TQA-14 |
 
 ## Prostředí
 
