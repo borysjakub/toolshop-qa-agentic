@@ -1,12 +1,12 @@
-# BUG-018: Zákazník vidí faktury jiných zákazníků (výpis i detail faktury)
+# BUG-018: Zákazník vidí faktury jiných zákazníků (výpis, detail i hledání faktur)
 
 | | |
 |---|---|
 | **Stav** | Otevřená |
-| **Nalezeno** | 4. 10. 2026 |
-| **Oblast** | Objednávky (API `GET /invoices`, `GET /invoices/{id}`), bezpečnost (řízení přístupu) |
+| **Nalezeno** | 4. 10. 2026 (hledání doplněno 5. 10. 2026) |
+| **Oblast** | Objednávky (API `GET /invoices`, `GET /invoices/{id}`, `GET /invoices/search`), bezpečnost (řízení přístupu) |
 | **Závažnost** | Kritická (návrh, zdůvodnění níže) |
-| **Automatizovaný test** | [`tests/db/order-access.spec.ts`](../tests/db/order-access.spec.ts) („a customer cannot read another customer's invoice“, „the invoice list contains only the customer's own invoices“), označené `test.fail()` |
+| **Automatizovaný test** | [`tests/db/order-access.spec.ts`](../tests/db/order-access.spec.ts) („a customer cannot read another customer's invoice“, „the invoice list contains only the customer's own invoices“, „search does not find another customer's invoice“), označené `test.fail()` |
 | **Jira** | TQA-19 (souvisí s TQA-14) |
 
 ## Prostředí
@@ -23,16 +23,18 @@
 2. Jako zákazník A vytvoř objednávku (`POST /invoices`), ulož si `id` faktury.
 3. S tokenem zákazníka B zavolej `GET /invoices/{id faktury zákazníka A}`.
 4. S tokenem zákazníka B zavolej `GET /invoices`.
+5. S tokenem zákazníka B zavolej `GET /invoices/search?q={číslo faktury zákazníka A}`.
 
 Token zákazníka B patří opravdu jemu: `GET /users/me` vrací jeho `id` a `role: "user"`.
 
 ## Očekávaný výsledek
 
 Zákazník, který není administrátor, vidí jen svoje faktury, jako v referenční verzi bez chyb
-(`InvoiceService`: `getInvoice` a `getInvoices` filtrují `forUser(...)` přihlášeného uživatele):
+(`InvoiceService`: `getInvoice`, `getInvoices` a `searchInvoices` filtrují `forUser(...)` přihlášeného uživatele):
 
 - `GET /invoices/{id}` cizí faktury vrátí **404**,
-- `GET /invoices` vrátí jen vlastní faktury (nový zákazník bez objednávek: `total=0`).
+- `GET /invoices` vrátí jen vlastní faktury (nový zákazník bez objednávek: `total=0`),
+- `GET /invoices/search` najde jen vlastní faktury.
 
 ## Skutečný výsledek
 
@@ -40,8 +42,10 @@ Zákazník, který není administrátor, vidí jen svoje faktury, jako v referen
 |---|---|---|---|
 | with-bugs | `GET /invoices/{id}` faktury zákazníka A | **200** | ano: celá faktura (`user_id` zákazníka A, adresa, položky, částka, `invoice_number`, `payment_account_name`, `payment_account_number`) |
 | with-bugs | `GET /invoices` | 200 | ano: 18 faktur od 10 různých `user_id`, žádná vlastní |
+| with-bugs | `GET /invoices/search?q={číslo faktury A}` | 200 | ano: najde fakturu zákazníka A |
 | bez chyb `sprint5` | `GET /invoices/{id}` faktury jiného zákazníka | **404** | ne |
 | bez chyb `sprint5` | `GET /invoices` | 200 | ne (`total=0`) |
+| bez chyb `sprint5` | `GET /invoices/search?q={číslo cizí faktury}` | 200 | ne (0 výsledků, vlastník fakturu najde) |
 
 Kontrola: vlastník si svou fakturu načte v obou verzích (200), 404 v referenční verzi tedy
 znamená „nemáš přístup“, ne „faktura neexistuje“.
@@ -62,8 +66,15 @@ API1 Broken Object Level Authorization. Stejný typ chyby jako [BUG-013](bug-013
   expect(received).toEqual(expected)
   - Expected  -  1
   + Received  + 16
+
+  Error: another customer's invoices found by search
+  - Array []
+  + Array [
+  +   18,
+  + ]
   ```
-  Kontrolní test „a customer can read their own invoice“ prochází (prostředí funguje).
+  Kontrolní test „a customer can read their own invoice“ prochází (prostředí funguje). V testu hledání
+  nejdřív vlastník svou fakturu najde (hledání samo funguje).
 - Screenshot: není, chyba je v odpovědi API.
 
 ## Dopad
@@ -80,13 +91,14 @@ zákazníkem jedním požadavkem, bez zvláštních znalostí.
 
 ## Návrh opravy
 
-V `GET /invoices` i `GET /invoices/{id}` omezit dotaz na přihlášeného zákazníka (kromě role admin),
-jako referenční verze (`forUser(Auth::id())`). Cizí faktura vrátí 404. Totéž zkontrolovat
-u `GET /invoices/{id}/download-pdf` a vyhledávání `GET /invoices/search`.
+V `GET /invoices`, `GET /invoices/{id}` i `GET /invoices/search` omezit dotaz na přihlášeného
+zákazníka (kromě role admin), jako referenční verze (`forUser(Auth::id())`). Cizí faktura vrátí 404.
+Stažení PDF (`GET /invoices/{id}/download-pdf`) nechrání ani referenční verze, viz dotaz v Jiře.
 
 ## Co nebylo ověřeno
 
 - Veřejná instance with-bugs.practicesoftwaretesting.com (záměrně: čtení cizích faktur na sdíleném
   demu by sahalo na data ostatních uživatelů). Kód API je stejná verze.
-- `GET /invoices/search`, `GET /invoices/{id}/download-pdf` a změny cizích faktur (`PUT`, `PATCH`).
+- `GET /invoices/{id}/download-pdf` (PDF se na lokální kopii negeneruje). Změny cizích faktur viz
+  [BUG-025](bug-025-put-foreign-invoice-returns-200.md) a [BUG-026](bug-026-patch-invoice-not-allowed.md).
 - Faktury s platbou převodem (ověřené faktury byly na dobírku, platební pole byla `null`).

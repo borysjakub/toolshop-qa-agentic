@@ -27,8 +27,10 @@ Jira: [TQA-5](https://borysjakub.atlassian.net/browse/TQA-5) · Testy: [`tests/c
 ### Testovací data
 
 Košík je u nepřihlášeného zákazníka jen v prohlížeči (`sessionStorage`), každý test má vlastní
-čistý prohlížeč, takže testy na sobě nezávisí a nepotřebují účet. Produkty: Combination Pliers
-(id 1, $14.15) a Pliers (id 2, $12.01), `tests/helpers/cart.ts`.
+čistý prohlížeč, takže testy na sobě nezávisí a nepotřebují účet. Produkty: první dva produkty
+skladem z API (`productsInStock()` v `tests/helpers/cart.ts`), název i cena se berou z API.
+Původně byly napevno Combination Pliers a Pliers. 5. 10. 2026 je na sdíleném demu někdo vyprodal
+a všechny testy košíku selhaly na zakázaném „Add to cart“.
 
 ## 2. Testovací případy
 

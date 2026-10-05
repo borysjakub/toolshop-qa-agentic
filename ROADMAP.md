@@ -2,10 +2,16 @@
 
 Plán dalších kroků projektu. Každý krok je samostatný malý úkol: udělat, zkontrolovat, commitnout.
 
-## ▶ Kde pokračovat (stav k 4. 10. 2026)
+## ▶ Kde pokračovat (stav k 5. 10. 2026)
 
-Všechno je na GitHubu, CI zelené (59 testů proti lokální kopii v Dockeru), Jira je aktuální.
-TQA-5 čeká na odpověď vedoucího QA (dvě otázky v komentáři: AC5 a množství 0).
+Jira je aktuální (chyby až po TQA-27). Čeká se na odpovědi vedoucího QA:
+- TQA-5: dvě otázky v komentáři (AC5 a množství 0),
+- TQA-28: smí zákazník měnit stav cizí faktury a stahovat její PDF? (nechrání ani referenční verze).
+
+Nepotvrzený nález k rozhodnutí: celková cena košíku se usekává místo zaokrouhlení
+(2 × $12.01 + $48.41 ukáže $72.42 místo $72.43, ověřeno na lokální kopii). Test TC-04 ho chytí
+jen u některých produktů, viz Nápady.
+
 Další práci vybrat z „Nápady na další testy“ níže.
 
 Spojení s Jirou: `/mcp` → atlassian → přihlásit. Když se nástroje po přihlášení nenačtou,
@@ -69,6 +75,23 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
       - Očekávané chování ověřeno spuštěním referenční verze `sprint5` lokálně v Dockeru
         (vedle with-bugs, vlastní port), ne jen čtením kódu.
       - Helper `tests/helpers/orders.ts` (zákazník, objednávka, produkt na skladě) sdílejí databázové testy.
+- [x] **Navazující nálezy** (5. 10. 2026), ručně proklikané i v Google Chrome (Claude in Chrome):
+      - Faktury: hledání najde cizí fakturu (doplněno do BUG-018), `PUT` na cizí fakturu vrací 200
+        místo 404 ([BUG-025](bugs/bug-025-put-foreign-invoice-returns-200.md)), `PATCH` vrací 405 i vlastníkovi
+        ([BUG-026](bugs/bug-026-patch-invoice-not-allowed.md)). Ověřeno proti referenční verzi v Dockeru.
+      - Menu: [BUG-019](bugs/bug-019-categories-menu-wrong-items.md) (UNDEFINED, Chainsaws → 404),
+        [BUG-020](bugs/bug-020-home-link-opens-contact.md) (Home → kontakt),
+        [BUG-021](bugs/bug-021-typos-contakt-serch.md) (Contakt, Serch). Testy `tests/smoke/navigation.spec.ts`,
+        `tests/smoke/search-button.spec.ts`.
+      - Přístupnost: [BUG-022](bugs/bug-022-logo-broken-image.md) (logo broken.png),
+        [BUG-024](bugs/bug-024-cart-remove-button-not-accessible.md) (tlačítko odebrání, stejné i v referenci,
+        požadavek z WCAG). Košík: [BUG-023](bugs/bug-023-cart-table-header-columns.md) (hlavička tabulky).
+      - Jira TQA-20 až TQA-27, dotaz TQA-28.
+      - Poučení: testy košíku měly produkty napevno a na sdíleném demu selhaly, když je někdo vyprodal
+        (Combination Pliers stock 0). Helper `productsInStock()` bere produkty skladem z API.
+      - Poučení: tělo `PUT` bez povinného `total` skončilo 422 ještě před kontrolou přístupu
+        a test „odmítnutí“ prošel ze špatného důvodu. U testů přístupu vždy kontrola, že vlastník
+        stejný požadavek provede.
 
 ## Historie: Playwright Test Agents
 
@@ -117,21 +140,22 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
   pak kontroluje `alt` jednorázově. Když se zbytek produktů ještě vykresluje, může projít
   a `test.fail()` by hlásil falešné „opraveno“. Zvážit `expect.poll(...)`.
 
-- Tlačítko hledání se jmenuje „Serch“ (překlep, podobně jako BUG-002).
-- Košík (z TQA-5): tlačítko odebrání bez přístupného názvu a nedostupné z klávesnice;
-  v hlavičce tabulky dvakrát „Total“; množství v košíku povolí 0 (`min="0"`, referenční verze 1).
+- **Nepotvrzený nález:** celková cena košíku se usekává (72.4299… → $72.42, reference zaokrouhlí
+  na $72.43). TC-04 to odhalí jen u cen, jejichž součet nejde v plovoucí čárce přesně
+  (2 × Pliers + Bolt Cutters ano, Combination Pliers + Pliers ne). Po potvrzení: bug report
+  a samostatný test s kombinací, která chybu spolehlivě ukáže.
+- Hláška „Oeps, something went wrong.“ se jednou objevila po přidání do košíku (produkt se přidal).
+  Podruhé se neukázala, síťová stopa ani konzole nic neukázaly. Zkusit zopakovat.
+- Detail produktu: „Add to cart“ překrývá „Add to favourites“; nadpis „Reltded products“.
+- Košík (z TQA-5): množství v košíku povolí 0 (`min="0"`, referenční verze 1), čeká na odpověď v TQA-5.
 - Objednávky (z SQL testů): `invoices` ukládá `payment_account_number` v čitelné podobě.
-- Faktury (z BUG-018): ověřit `GET /invoices/search`, `GET /invoices/{id}/download-pdf`
-  a změnu cizí faktury (`PUT`, `PATCH`).
+- Faktury: změna stavu a stažení PDF, čeká na odpověď v TQA-28.
 - Počítadlo výsledků na okamžik ukáže „26 products found“ a teprve pak správné číslo.
   Vysvětleno: 26 je `total` z `GET /products` (výpis bez půjčovny), stránka ho ukáže,
   než dorazí odpověď hledání. Drobná vada zobrazení, testy na to čekají (`searchFor`).
 - Přístupnost vyhledávání: pole nemá přístupný název, reset se jmenuje jen „X“, po hledání
   zůstává prázdná navigace „Pagination“; ikona u nadpisu „Search“ je rozbitý obrázek.
 - `alt` u obrázků i na dalších stránkách: stránkování, kategorie, detail produktu.
-- Položka menu zní „Contakt“ místo „Contact“.
-- Logo v hlavičce se nenačte (rozbitý obrázek). Ověřit i `alt`, podobně jako BUG-001.
 - Výběr řazení je po načtení prázdný. Ověřit, jestli je to chyba, nebo jen nevybraná výchozí hodnota.
 - Z TQA-1 (viz [tasks/tqa-1-login.md](tasks/tqa-1-login.md), sekce 4): API registrace vrací hash hesla;
-  tlačítko zobrazení hesla nemá přístupný název; hláška přihlášení nemá `aria-live`;
-  odkaz „Home“ vede na `#/contact`.
+  tlačítko zobrazení hesla nemá přístupný název; hláška přihlášení nemá `aria-live`.
