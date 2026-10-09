@@ -1,6 +1,6 @@
 # toolshop-qa-agentic
 
-[![Playwright Tests](https://github.com/svobodaprojevu/toolshop-qa-agentic/actions/workflows/playwright.yml/badge.svg)](https://github.com/svobodaprojevu/toolshop-qa-agentic/actions/workflows/playwright.yml)
+[![Playwright Tests](https://github.com/borysjakub/toolshop-qa-agentic/actions/workflows/playwright.yml/badge.svg)](https://github.com/borysjakub/toolshop-qa-agentic/actions/workflows/playwright.yml)
 
 > **In English:** QA portfolio project. End-to-end, API and database tests (Playwright, TypeScript,
 > SQL, Postman) for a practice e-shop with deliberately injected bugs. Work arrives as Jira tickets;
@@ -50,7 +50,7 @@ má u sebe zapsaný očekávaný text chyby (`knownBug()`) a vlastní reporter
 ## Instalace a spuštění
 
 ```bash
-git clone https://github.com/svobodaprojevu/toolshop-qa-agentic.git
+git clone https://github.com/borysjakub/toolshop-qa-agentic.git
 cd toolshop-qa-agentic
 npm install
 npx playwright install chromium

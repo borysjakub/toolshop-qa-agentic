@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/svobodaprojevu/toolshop-qa-agentic.git"
+    "url": "git+https://github.com/borysjakub/toolshop-qa-agentic.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jakub Borys",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/svobodaprojevu/toolshop-qa-agentic/issues"
+    "url": "https://github.com/borysjakub/toolshop-qa-agentic/issues"
   },
-  "homepage": "https://github.com/svobodaprojevu/toolshop-qa-agentic#readme",
+  "homepage": "https://github.com/borysjakub/toolshop-qa-agentic#readme",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.3",
