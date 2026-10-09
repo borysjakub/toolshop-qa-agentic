@@ -8,17 +8,48 @@ export type CartProduct = { id: number; name: string; price: number };
 // (Combination Pliers was at stock 0 on 5. 10. 2026) and an out-of-stock product
 // cannot be added to the cart at all. Name and price come from the API too.
 export async function productsInStock(request: APIRequestContext, count = 2): Promise<CartProduct[]> {
+  const usable = (await allProductsInStock(request)).slice(0, count);
+  expect(usable, 'products in stock on the first page').toHaveLength(count);
+  return usable;
+}
+
+// All purchasable products in stock on the first page of the product list.
+export async function allProductsInStock(request: APIRequestContext): Promise<CartProduct[]> {
   const response = await request.get(`${API_URL}/products`, { params: { page: 1 } });
   expect(response.status(), 'product list for the cart tests').toBe(200);
   const products: (CartProduct & { stock: number; is_rental: boolean | number })[] = (await response.json()).data;
 
   // Stock of at least 10: the tests put up to 5 pieces of one product in the cart.
-  const usable = products
+  return products
     .filter((product) => product.stock >= 10 && !product.is_rental)
-    .slice(0, count)
     .map(({ id, name, price }) => ({ id, name, price }));
-  expect(usable, 'products in stock on the first page').toHaveLength(count);
-  return usable;
+}
+
+export type CartLine = { product: CartProduct; quantity: number };
+
+// The correct total in cents: every price is a whole number of cents, so integer arithmetic is exact.
+export function totalCents(lines: CartLine[]): number {
+  return lines.reduce((sum, line) => sum + Math.round(line.product.price * 100) * line.quantity, 0);
+}
+
+// BUG-027 (bugs/bug-027-cart-total-cut-off.md): the app adds the prices in floating point (2 × 12.01 + 48.41 = 72.42999…) and cuts off
+// the rest instead of rounding, so it shows $72.42. How exactly it cuts off is not known (testing
+// blind), so both plausible ways are computed: Math.floor(sum × 100) and cutting the decimal text.
+function truncatedTotalsCents(lines: CartLine[]): number[] {
+  const sum = lines.reduce((total, line) => total + line.product.price * line.quantity, 0);
+  const [whole, decimals = ''] = String(sum).split('.');
+  return [Math.floor(sum * 100), Number(whole) * 100 + Number(decimals.padEnd(2, '0').slice(0, 2))];
+}
+
+// True when cutting off gives the correct total in both ways, so a test of something else
+// does not depend on BUG-027.
+export function totalIsExact(lines: CartLine[]): boolean {
+  return truncatedTotalsCents(lines).every((cents) => cents === totalCents(lines));
+}
+
+// True when cutting off gives a wrong total in both ways: the cart shows BUG-027 for sure.
+export function totalShowsTruncation(lines: CartLine[]): boolean {
+  return truncatedTotalsCents(lines).every((cents) => cents !== totalCents(lines));
 }
 
 // "$14.15" style, as the cart shows prices.

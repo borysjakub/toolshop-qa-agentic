@@ -3,15 +3,35 @@
 
 import { test, expect } from '@playwright/test';
 import { knownBug } from '../helpers/known-bug';
-import { addToCart, cartRow, money, openCart, productsInStock, removeButton, type CartProduct } from '../helpers/cart';
+import {
+  addToCart,
+  allProductsInStock,
+  cartRow,
+  money,
+  openCart,
+  removeButton,
+  totalIsExact,
+  type CartProduct,
+} from '../helpers/cart';
 
 test.describe('shopping cart', () => {
   // Two different products in stock, picked fresh for every test (shared public demo).
+  // Their totals in TC-04 (2 × first + second) and TC-05 (5 × first) must not depend on the cut-off
+  // total (BUG-027, tested in cart-total-rounding.spec.ts), otherwise the result would change
+  // with whatever is in stock that day.
   let first: CartProduct;
   let second: CartProduct;
 
   test.beforeEach(async ({ request }) => {
-    [first, second] = await productsInStock(request);
+    const products = await allProductsInStock(request);
+    const pairs = products.flatMap((a) => products.filter((b) => b.id !== a.id).map((b) => [a, b] as const));
+    const pair = pairs.find(
+      ([a, b]) =>
+        totalIsExact([{ product: a, quantity: 2 }, { product: b, quantity: 1 }]) &&
+        totalIsExact([{ product: a, quantity: 5 }]),
+    );
+    expect(pair, 'two products in stock whose totals do not depend on BUG-027').toBeDefined();
+    [first, second] = pair!;
   });
 
   // AC1
