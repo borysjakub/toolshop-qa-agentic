@@ -2,8 +2,18 @@
 
 [![Playwright Tests](https://github.com/svobodaprojevu/toolshop-qa-agentic/actions/workflows/playwright.yml/badge.svg)](https://github.com/svobodaprojevu/toolshop-qa-agentic/actions/workflows/playwright.yml)
 
+> **In English:** QA portfolio project. End-to-end, API and database tests (Playwright, TypeScript,
+> SQL, Postman) for a practice e-shop with deliberately injected bugs. Work arrives as Jira tickets;
+> results are test cases, automated tests, 27 bug reports and a CI pipeline (GitHub Actions + Docker).
+> The tests are written by an AI agent (Claude Code) under human review, kept in check by project
+> rules, hooks and a reviewer subagent. Every known bug has a test that fails until the bug is fixed.
+> Documentation is in Czech.
+
 Automatizované testy cvičného e-shopu [Toolshop](https://with-bugs.practicesoftwaretesting.com)
 v [Playwright](https://playwright.dev) a TypeScriptu: UI, API a databáze (SQL).
+
+**V číslech:** 79 automatizovaných testů (68 proti veřejné aplikaci, 11 databázových),
+27 bug reportů (4 kritické, 3 vysoké, 11 středních, 9 nízkých), 29 ticketů v Jiře, CI denně.
 Testovaná verze aplikace obsahuje záměrně zanesené chyby, úkolem je je najít, doložit a nahlásit.
 
 Projekt simuluje práci QA testera v týmu: zadání přichází jako tickety v Jiře, výsledkem jsou
@@ -17,10 +27,12 @@ skilly, hooky a kontrolní subagent (viz [Jak tu pracuje AI](#jak-tu-pracuje-ai)
 |---|---|---|
 | Přihlášení ([TQA-1](tasks/tqa-1-login.md)) | `tests/auth/` | [BUG-003](bugs/bug-003-account-not-locked.md) účet se nezablokuje (Kritická), [BUG-004](bugs/bug-004-user-menu-data-not-found.md), [BUG-005](bugs/bug-005-login-form-no-validation.md) |
 | Vyhledávání ([plán](specs/search.md)) | `tests/search/`, `tests/accessibility/search-validation.spec.ts` | [BUG-006](bugs/bug-006-search-hammer-misses-sledgehammer.md) až [BUG-011](bugs/bug-011-search-validation-not-announced.md), nejvážnější [BUG-007](bugs/bug-007-search-from-page-2-shows-no-products.md) hledání ze stránky 2 nic neukáže |
-| Košík ([TQA-5](tasks/tqa-5-cart.md)) | `tests/cart/` | [BUG-014](bugs/bug-014-cart-line-total-zero.md) mezisoučet $00.00, [BUG-015](bugs/bug-015-cart-remove-does-nothing.md) položku nejde odebrat |
+| Košík ([TQA-5](tasks/tqa-5-cart.md)) | `tests/cart/` | [BUG-014](bugs/bug-014-cart-line-total-zero.md) mezisoučet $00.00, [BUG-015](bugs/bug-015-cart-remove-does-nothing.md) položku nejde odebrat (Vysoká), [BUG-023](bugs/bug-023-cart-table-header-columns.md) hlavička tabulky, [BUG-027](bugs/bug-027-cart-total-cut-off.md) součet se usekává o cent |
+| Faktury (API + SQL) | `tests/db/order-access.spec.ts` | [BUG-018](bugs/bug-018-customer-sees-other-invoices.md) zákazník vidí cizí faktury (Kritická), [BUG-025](bugs/bug-025-put-foreign-invoice-returns-200.md), [BUG-026](bugs/bug-026-patch-invoice-not-allowed.md) |
+| Menu a navigace | `tests/smoke/navigation.spec.ts`, `tests/smoke/search-button.spec.ts` | [BUG-019](bugs/bug-019-categories-menu-wrong-items.md) kategorie „UNDEFINED“ a 404, [BUG-020](bugs/bug-020-home-link-opens-contact.md) „Home“ otevře kontakt, [BUG-021](bugs/bug-021-typos-contakt-serch.md) „Contakt“, „Serch“ |
 | REST API (Playwright + [Postman](postman/)) | `tests/api/` | [BUG-016](bugs/bug-016-api-returns-password-hash.md) API vrací hash hesla (Vysoká), [BUG-017](bugs/bug-017-register-reveals-password-hint.md) „Your password hint is …“ |
 | Objednávky v databázi (SQL) | `tests/db/` | [BUG-012](bugs/bug-012-order-price-from-client.md) cenu objednávky určuje klient, [BUG-013](bugs/bug-013-order-for-another-customer.md) objednávka na cizí účet (obojí Kritická) |
-| Přístupnost, smoke | `tests/accessibility/`, `tests/smoke/` | [BUG-001](bugs/bug-001-product-images-missing-alt.md) obrázky bez `alt`, [BUG-002](bugs/bug-002-sort-heading-typo.md) „Sorth“ |
+| Přístupnost, smoke | `tests/accessibility/`, `tests/smoke/` | [BUG-001](bugs/bug-001-product-images-missing-alt.md) obrázky bez `alt`, [BUG-002](bugs/bug-002-sort-heading-typo.md) „Sorth“, [BUG-022](bugs/bug-022-logo-broken-image.md) rozbité logo, [BUG-024](bugs/bug-024-cart-remove-button-not-accessible.md) odebrání z košíku nejde klávesnicí |
 
 Všechny bug reporty: [`bugs/`](bugs/). Každá chyba má automatizovaný test označený `test.fail()`:
 dokud chyba trvá, test selže a počítá se jako prošlý. Až ji někdo opraví, test začne procházet

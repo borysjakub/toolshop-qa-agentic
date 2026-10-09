@@ -2,15 +2,15 @@
 
 Plán dalších kroků projektu. Každý krok je samostatný malý úkol: udělat, zkontrolovat, commitnout.
 
-## ▶ Kde pokračovat (stav k 5. 10. 2026)
+## ▶ Stav (9. 10. 2026): projekt je uzavřený a připravený jako portfolio
 
-Jira je aktuální (chyby až po TQA-27). Čeká se na odpovědi vedoucího QA:
+Hlavní oblasti jsou pokryté (viz README, sekce Výsledky), CI je zelená a všechny nalezené chyby mají
+bug report, Jira ticket a test se `test.fail()`. Sekce „Nápady na další testy“ níže je backlog
+pro případné pokračování, ne nedodělky.
+
+Jira je aktuální (chyby až po TQA-29). Otevřené dotazy na vedoucího QA (neblokují nic dalšího):
 - TQA-5: dvě otázky v komentáři (AC5 a množství 0),
 - TQA-28: smí zákazník měnit stav cizí faktury a stahovat její PDF? (nechrání ani referenční verze).
-
-Nepotvrzený nález k rozhodnutí: celková cena košíku se usekává místo zaokrouhlení
-(2 × $12.01 + $48.41 ukáže $72.42 místo $72.43, ověřeno na lokální kopii). Test TC-04 ho chytí
-jen u některých produktů, viz Nápady.
 
 Další práci vybrat z „Nápady na další testy“ níže.
 
@@ -86,12 +86,20 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
       - Přístupnost: [BUG-022](bugs/bug-022-logo-broken-image.md) (logo broken.png),
         [BUG-024](bugs/bug-024-cart-remove-button-not-accessible.md) (tlačítko odebrání, stejné i v referenci,
         požadavek z WCAG). Košík: [BUG-023](bugs/bug-023-cart-table-header-columns.md) (hlavička tabulky).
-      - Jira TQA-20 až TQA-27, dotaz TQA-28.
+      - Jira TQA-20 až TQA-27 a TQA-29, dotaz TQA-28.
       - Poučení: testy košíku měly produkty napevno a na sdíleném demu selhaly, když je někdo vyprodal
         (Combination Pliers stock 0). Helper `productsInStock()` bere produkty skladem z API.
+      - Košík: [BUG-027](bugs/bug-027-cart-total-cut-off.md) (Jira TQA-29), celková cena se usekává
+        ($14.15 + $48.41 = $62.55 místo $62.56). Test `tests/cart/cart-total-rounding.spec.ts` si sám
+        najde produkty skladem, u kterých se chyba projeví; TC-04 a TC-05 naopak vybírají produkty,
+        u kterých na useknutí nezáleží (`totalIsExact()`), aby nezávisely na aktuálním skladu.
       - Poučení: tělo `PUT` bez povinného `total` skončilo 422 ještě před kontrolou přístupu
         a test „odmítnutí“ prošel ze špatného důvodu. U testů přístupu vždy kontrola, že vlastník
         stejný požadavek provede.
+- [x] **Uzavření projektu** (9. 10. 2026): `product-images.spec.ts` čeká na odpověď `GET /products`
+      a vykreslení všech obrázků (dřív jen prvního, mohl falešně hlásit „opraveno“); ověřeno oběma
+      směry (3× očekávané selhání, se simulovanou opravou „Expected to fail, but passed“).
+      README doplněné o BUG-018 až BUG-027, souhrn v číslech a anglické shrnutí.
 
 ## Historie: Playwright Test Agents
 
@@ -136,14 +144,6 @@ Kontejnery nechat běžet není nutné: `.\local-toolshop\stop.ps1`.
 
 ## Nápady na další testy
 
-- Z `test-reviewer`: `tests/accessibility/product-images.spec.ts` čeká jen na první obrázek,
-  pak kontroluje `alt` jednorázově. Když se zbytek produktů ještě vykresluje, může projít
-  a `test.fail()` by hlásil falešné „opraveno“. Zvážit `expect.poll(...)`.
-
-- **Nepotvrzený nález:** celková cena košíku se usekává (72.4299… → $72.42, reference zaokrouhlí
-  na $72.43). TC-04 to odhalí jen u cen, jejichž součet nejde v plovoucí čárce přesně
-  (2 × Pliers + Bolt Cutters ano, Combination Pliers + Pliers ne). Po potvrzení: bug report
-  a samostatný test s kombinací, která chybu spolehlivě ukáže.
 - Hláška „Oeps, something went wrong.“ se jednou objevila po přidání do košíku (produkt se přidal).
   Podruhé se neukázala, síťová stopa ani konzole nic neukázaly. Zkusit zopakovat.
 - Detail produktu: „Add to cart“ překrývá „Add to favourites“; nadpis „Reltded products“.
